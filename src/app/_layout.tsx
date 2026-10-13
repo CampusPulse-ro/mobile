@@ -11,7 +11,7 @@ const theme = {
     card: color.raised,
     text: color.ink,
     border: color.line,
-    primary: color.brand,
+    primary: color.accent,
   },
 }
 

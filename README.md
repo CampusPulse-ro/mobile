@@ -7,15 +7,15 @@ a map of buildings and rooms, reminders and campus events. It talks to
 
 **Stack:** Expo SDK 57 · React Native 0.86 · TypeScript · expo-router (native tabs) ·
 React Compiler · a **dev client**, so custom Swift/Kotlin modules are first-class ·
-Bun · oxlint. Dark theme only.
+Bun · oxlint.
 
 ## Layout
 
 | Path | What |
 |---|---|
-| `src/app/` | Routes. `_layout` sets the dark theme; `(tabs)/` = Today, Timetable, Map, Profile (placeholders) |
+| `src/app/` | Routes. `_layout` sets the navigation theme; `(tabs)/` = Today, Timetable, Map, Profile (placeholders) |
 | `src/components/ui.tsx` | Shared building blocks (`Screen`, `Title`, `Muted`, `Placeholder`) |
-| `src/theme.ts` | Design tokens: the dark palette shared with the web app |
+| `src/theme.ts` | Design tokens (colors, spacing, radius), the same names and values as the web app |
 | `modules/` | Custom native modules (Swift/Kotlin); see its README |
 | `assets/images/` | Placeholder icon and splash ("CP" lettermark) |
 
@@ -30,13 +30,22 @@ Bun · oxlint. Dark theme only.
   `campuspulse://token=…`.
 - No EAS project yet: `eas init` adds `owner` and `extra.eas.projectId` to `app.json`.
 
+## Prerequisites
+
+- [Bun](https://bun.sh) (the package manager and script runner)
+- Git, and a GitHub account with access to the `CampusPulse-ro` org
+- An Android phone with **Expo Go** (Google Play) on the same Wi-Fi as your computer. Later, once
+  the app has native modules, a development build replaces Expo Go.
+
 ## Run it
 
 ```bash
 bun install
-bun start:go     # Expo Go: works while there are no custom native modules
+bun start:go     # Expo Go: scan the QR code with the Expo Go app on your phone
 bun start        # dev client: needs a dev build installed on the device/simulator
 ```
+
+Expo Go works while there are no custom native modules.
 
 Dev build: `eas build --profile development --platform android|ios`
 (`development-simulator` for the iOS simulator), or locally with `bun run android`
@@ -46,3 +55,9 @@ Dev build: `eas build --profile development --platform android|ios`
 
 `bun run lint` · `bun run typecheck` · `bun run doctor`. CI (`lint, typecheck &
 bundle`) also bundles the JS for iOS and Android.
+
+## Contributing
+
+- [`CONTRIBUTING.md`](CONTRIBUTING.md): the branch → PR → squash-merge workflow and the code standards
+- [`docs/ai-development.md`](docs/ai-development.md): how to work with AI tools on this repo
+- [`docs/ai-context.md`](docs/ai-context.md): the project context to give an AI at the start of a chat

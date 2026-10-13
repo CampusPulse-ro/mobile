@@ -1,18 +1,21 @@
 /**
- * CampusPulse design tokens. Dark only: there is no light theme.
+ * CampusPulse design tokens. One dark palette for now; a light theme would be a second set
+ * with the same names.
  *
- * The web app uses the same palette, so the two clients read as one product.
+ * Same names and values as the web app's `@theme` tokens (web/src/index.css), so the two
+ * clients read as one product. Change both together.
  */
 export const color = {
   page: '#0f1115',
-  raised: '#171a21',
-  sunken: '#1f232c',
-  ink: '#e8eaee',
-  inkSoft: '#c3c8d1',
-  inkMuted: '#8b93a1',
-  line: '#262a33',
-  brand: '#4f8cff',
-  danger: '#f87171',
+  raised: '#181b21',
+  sunken: '#0b0d10',
+  ink: '#e6e8eb',
+  inkSoft: '#c2c8cf',
+  inkMuted: '#9aa3ad',
+  line: '#262a31',
+  lineStrong: '#3a404a',
+  accent: '#4f8cff',
+  warn: '#f2b84b',
 } as const
 
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 } as const
