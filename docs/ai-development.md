@@ -30,17 +30,21 @@ An AI only knows what it can see. How you show it the project depends on the too
 ## 3. Prompts that work
 
 **A new screen**
+
 > I'm adding [what] to [screen]. Here is the current file: [paste]. Follow the patterns in
 > `src/components/ui.tsx` and the rules in ai-context.md. Plan first, then code.
 
 **A bug**
+
 > I did [steps], expected [X], got [Y]. Exact error: [paste the whole message]. File: [paste].
 > Explain the cause before you fix it.
 
 **Understanding code**
+
 > Explain what this file does, step by step, for a beginner: [paste].
 
 **A review before your PR**
+
 > Here is my change: [paste the diff]. Check it against the rules in ai-context.md. What is wrong,
 > risky or unclear?
 
@@ -69,7 +73,7 @@ When that happens, say what's wrong and ask again. Don't paste its code in and h
 
 ## 7. Before you open the PR
 
-- [ ] `bun run lint` and `bun run typecheck` pass
+- [ ] `bun run format`, then `bun run lint` and `bun run typecheck` pass
 - [ ] you ran it on the phone and looked at every screen you touched
 - [ ] loading, error and empty states checked
 - [ ] you can explain every line of the diff

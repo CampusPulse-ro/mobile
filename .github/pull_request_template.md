@@ -10,6 +10,6 @@ Closes #
 
 ## Checklist
 
-- [ ] `bun run lint` and `bun run typecheck` pass
+- [ ] `bun run format:check`, `bun run lint` and `bun run typecheck` pass
 - [ ] every screen I touched checked on a phone, including loading, error and empty states
 - [ ] I can explain every line of this diff

@@ -1,7 +1,7 @@
 name: Bug
 description: Something doesn't work as it should
-labels: ["bug"]
-projects: ["CampusPulse-ro/1"]
+labels: ['bug']
+projects: ['CampusPulse-ro/1']
 body:
   - type: textarea
     id: what
@@ -20,8 +20,7 @@ body:
     id: steps
     attributes:
       label: Steps to reproduce
-      value: |
-        1. 
+      value: "1. \n"
     validations:
       required: true
   - type: input

@@ -20,14 +20,14 @@ plain words. Keep each change small enough to read and test in a few minutes.
 
 ## Structure
 
-| Path | What |
-|---|---|
-| `src/app/` | Screens. Each file is a route (expo-router). `(tabs)/` = Today, Timetable, Map, Profile |
-| `src/app/_layout.tsx` | Root layout: navigation theme and stack |
-| `src/components/ui.tsx` | Shared building blocks: `Screen`, `Title`, `Muted`, `Placeholder` |
-| `src/theme.ts` | Design tokens: `color`, `space`, `radius`. The only place colors are defined |
-| `modules/` | Native Kotlin/Swift modules |
-| `app.json`, `eas.json` | App identity and build profiles |
+| Path                    | What                                                                                    |
+| ----------------------- | --------------------------------------------------------------------------------------- |
+| `src/app/`              | Screens. Each file is a route (expo-router). `(tabs)/` = Today, Timetable, Map, Profile |
+| `src/app/_layout.tsx`   | Root layout: navigation theme and stack                                                 |
+| `src/components/ui.tsx` | Shared building blocks: `Screen`, `Title`, `Muted`, `Placeholder`                       |
+| `src/theme.ts`          | Design tokens: `color`, `space`, `radius`. The only place colors are defined            |
+| `modules/`              | Native Kotlin/Swift modules                                                             |
+| `app.json`, `eas.json`  | App identity and build profiles                                                         |
 
 ## Rules for your answers
 
@@ -42,10 +42,12 @@ plain words. Keep each change small enough to read and test in a few minutes.
 6. **Don't invent APIs.** If you are not sure a prop, function or library exists in Expo SDK 57 /
    React Native 0.86, say that you are not sure.
 7. **Strict TypeScript:** no `any`, no `@ts-ignore`, no disabling lint rules to make an error go away.
-8. **Imports use the `@/` alias** (`@/components/ui`, `@/theme`).
+8. **Imports use the `@/` alias** (`@/components/ui`, `@/theme`). Formatting is done by Prettier
+   (`bun run format`), so don't spend effort on spacing or line breaks.
 9. **Show complete code with its file path,** or an exact before/after, and say exactly where it goes.
 10. **Never put secrets in code:** passwords, tokens, API keys.
 11. **Don't change** `app.json` identity (`ro.campuspulse.app`, scheme `campuspulse`), `eas.json`,
-    `.github/`, `modules/` or package versions. Those belong to Sebastian; tell me if a change there
+    `.github/`, `modules/`, `.prettierrc`, `.prettierignore`, `.editorconfig`, `.gitattributes`,
+    `.vscode/` or package versions. Those belong to Sebastian; tell me if a change there
     seems needed.
 12. **End every answer with how to check it works:** what to run, what to tap, and what I should see.
