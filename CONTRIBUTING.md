@@ -8,7 +8,11 @@ Work is tracked in **issues**. Every PR starts from one: the issue says what to 
 what "done" means (its acceptance criteria). If you want to do something that has no issue, open
 one first (the **Task** or **Bug** template) or ask Sebastian to.
 
-1. Pick or get assigned an issue. Read it fully; ask in the issue if anything is unclear.
+All issues of the three repos are on the [CampusPulse board](https://github.com/orgs/CampusPulse-ro/projects/1)
+(columns Todo → In Progress → In Review → Done). New issues land there by themselves.
+
+1. Pick or get assigned an issue. Read it fully; ask in the issue if anything is unclear. Move
+   its card to **In Progress**.
 2. Start from an up-to-date `main`:
    ```bash
    git switch main
@@ -24,7 +28,8 @@ one first (the **Task** or **Bug** template) or ask Sebastian to.
    - **What** changed
    - **Why**
    - **How I tested it**: which device, what you tapped, and a screenshot for anything visible
-6. CI has to be green (lint, typecheck, bundle). Sebastian reviews.
+6. Move the card to **In Review**. CI has to be green (lint, typecheck, bundle), and a PR needs one
+   approval: Sebastian reviews.
 7. Merging is **squash only**: the whole PR becomes one commit on `main`, titled with the PR
    title. So write a good PR title; individual commit messages matter less.
 8. After the merge: `git switch main && git pull`, then delete your local branch
