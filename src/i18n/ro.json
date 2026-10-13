@@ -7,11 +7,11 @@
   },
   "today": {
     "title": "Azi",
-    "about": "Cursurile și termenele tale de azi."
+    "about": "Orele și termenele limită de azi."
   },
   "timetable": {
     "title": "Orar",
-    "about": "Cursurile și laboratoarele tale din fiecare săptămână."
+    "about": "Cursurile și laboratoarele tale săptămânale."
   },
   "map": {
     "title": "Hartă",

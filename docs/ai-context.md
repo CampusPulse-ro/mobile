@@ -20,15 +20,15 @@ plain words. Keep each change small enough to read and test in a few minutes.
 
 ## Structure
 
-| Path                    | What                                                                                    |
-| ----------------------- | --------------------------------------------------------------------------------------- |
-| `src/app/`              | Screens. Each file is a route (expo-router). `(tabs)/` = Today, Timetable, Map, Profile |
-| `src/app/_layout.tsx`   | Root layout: navigation theme and stack                                                 |
-| `src/components/ui.tsx` | Shared building blocks: `Screen`, `Title`, `Muted`, `Placeholder`                       |
-| `src/theme.ts`          | Design tokens: `color`, `space`, `radius`. The only place colors are defined            |
-| `src/i18n/`             | Translations: `en.json`, `ro.json` (same keys), `index.ts` (setup), `format.ts` (dates) |
-| `modules/`              | Native Kotlin/Swift modules                                                             |
-| `app.json`, `eas.json`  | App identity and build profiles                                                         |
+| Path                    | What                                                                                                  |
+| ----------------------- | ----------------------------------------------------------------------------------------------------- |
+| `src/app/`              | Screens. Each file is a route (expo-router). `(tabs)/` = Today, Timetable, Map, Profile               |
+| `src/app/_layout.tsx`   | Root layout: navigation theme and stack                                                               |
+| `src/components/ui.tsx` | Shared building blocks: `Screen`, `Title`, `Muted`, `Placeholder`                                     |
+| `src/theme.ts`          | Design tokens: `color`, `space`, `radius`. The only place colors are defined                          |
+| `src/i18n/`             | Translations: `en.json`, `ro.json` (same keys), `index.ts` (setup), `format.ts` (`useDateTimeFormat`) |
+| `modules/`              | Native Kotlin/Swift modules                                                                           |
+| `app.json`, `eas.json`  | App identity and build profiles                                                                       |
 
 ## Rules for your answers
 
@@ -36,10 +36,14 @@ plain words. Keep each change small enough to read and test in a few minutes.
    the closest existing one and match it.
 2. **Style only with the tokens from `src/theme.ts`.** No hex colors or magic numbers in screens.
 3. **Screens that load data handle four states:** loading, error with retry, empty, and data.
-4. **No user-facing text written directly in components.** Every text is a key added to BOTH
-   `src/i18n/en.json` and `src/i18n/ro.json` (Romanian with diacritics: ș ț ă î â), used with
-   `const { t } = useTranslation()` and `t('section.key')`. English is the default language.
-   Dates and times go through `formatDate` / `formatTime` from `src/i18n/format.ts`.
+4. **No user-facing text written directly in components,** and that includes props such as
+   `accessibilityLabel` and `placeholder` (oxlint's `react/jsx-no-literals` only catches text
+   children). Every text is a key in BOTH `src/i18n/en.json` and `src/i18n/ro.json`, used with
+   `const { t } = useTranslation()` and `t('section.key')`; a key in only one file, or an unknown
+   key, fails the typecheck. Romanian uses ș ț with a comma below, never ş ţ with a cedilla (CI
+   checks). The `language.*` names stay in their own language in both files ("Română" in
+   en.json) on purpose. English is the default language. Dates and times: the
+   `useDateTimeFormat()` hook from `src/i18n/format.ts` (campus time, the app's language).
 5. **No new packages unless I ask.** If one is truly needed, say so and why, and use
    `bunx expo install <name>` so the version matches Expo SDK 57.
 6. **The backend is called only through the generated API client.** Never `fetch` with a URL written

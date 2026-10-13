@@ -24,7 +24,9 @@ export default function RootLayout() {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    void loadSavedLanguage().finally(() => setReady(true))
+    // A storage call that never answers must not keep the splash up forever.
+    const timeout = new Promise<void>((resolve) => setTimeout(resolve, 1500))
+    void Promise.race([loadSavedLanguage(), timeout]).finally(() => setReady(true))
   }, [])
 
   useEffect(() => {

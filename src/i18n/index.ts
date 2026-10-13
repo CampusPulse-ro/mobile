@@ -3,8 +3,9 @@
  * The app does not follow the device language: everyone starts in English (decided
  * 2026-10-14), and the choice is saved on the device.
  *
- * Every user-facing text is a key in BOTH en.json and ro.json: a key missing from
- * ro.json is a type error (below), and `t('…')` only accepts keys that exist.
+ * Every user-facing text is a key in BOTH en.json and ro.json: a key in only one of them is a
+ * type error (below), and `t('…')` only accepts keys that exist in en.json, with or without a
+ * default text (`strictKeyChecks`, src/i18n/i18next.d.ts).
  */
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import i18n from 'i18next'
@@ -13,8 +14,10 @@ import { initReactI18next } from 'react-i18next'
 import en from './en.json'
 import roJson from './ro.json'
 
-// Same shape as en.json, or this line fails to type-check.
+// ro.json has every key of en.json (this line), and no key that en.json lacks (the next):
+// either way a mismatch fails the typecheck.
 const ro: typeof en = roJson
+void (en satisfies typeof roJson)
 
 export const LANGUAGES = ['en', 'ro'] as const
 export type Language = (typeof LANGUAGES)[number]
@@ -22,7 +25,7 @@ export const DEFAULT_LANGUAGE: Language = 'en'
 
 const STORAGE_KEY = 'campuspulse.language'
 
-function isLanguage(value: unknown): value is Language {
+export function isLanguage(value: unknown): value is Language {
   return typeof value === 'string' && (LANGUAGES as readonly string[]).includes(value)
 }
 

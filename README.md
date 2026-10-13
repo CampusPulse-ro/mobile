@@ -11,14 +11,14 @@ Bun · oxlint.
 
 ## Layout
 
-| Path                    | What                                                                                                             |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `src/app/`              | Routes. `_layout` sets the navigation theme; `(tabs)/` = Today, Timetable, Map, Profile (placeholders)           |
-| `src/components/ui.tsx` | Shared building blocks (`Screen`, `Title`, `Muted`, `Placeholder`)                                               |
-| `src/theme.ts`          | Design tokens (colors, spacing, radius), the same names and values as the web app                                |
-| `src/i18n/`             | Translations: English (default) and Romanian in `en.json` / `ro.json`, setup in `index.ts`, dates in `format.ts` |
-| `modules/`              | Custom native modules (Swift/Kotlin); see its README                                                             |
-| `assets/images/`        | Placeholder icon and splash ("CP" lettermark)                                                                    |
+| Path                    | What                                                                                                                                       |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/app/`              | Routes. `_layout` sets the navigation theme; `(tabs)/` = Today, Timetable, Map, Profile (placeholders)                                     |
+| `src/components/ui.tsx` | Shared building blocks (`Screen`, `Title`, `Muted`, `Placeholder`)                                                                         |
+| `src/theme.ts`          | Design tokens (colors, spacing, radius), the same names and values as the web app                                                          |
+| `src/i18n/`             | Translations: English (default) and Romanian in `en.json` / `ro.json`, setup in `index.ts`, dates via `useDateTimeFormat()` in `format.ts` |
+| `modules/`              | Custom native modules (Swift/Kotlin); see its README                                                                                       |
+| `assets/images/`        | Placeholder icon and splash ("CP" lettermark)                                                                                              |
 
 `ios/` and `android/` are **not committed**: `expo prebuild` generates them from
 `app.json` + config plugins (Continuous Native Generation), and EAS does that on every build.
@@ -47,6 +47,9 @@ bun start        # dev client: needs a dev build installed on the device/simulat
 ```
 
 Expo Go works while there are no custom native modules.
+
+A dev build made before i18n (#11) lacks AsyncStorage, which the saved language uses: build a
+fresh dev client after pulling. Expo Go already has it.
 
 Dev build: `eas build --profile development --platform android|ios`
 (`development-simulator` for the iOS simulator), or locally with `bun run android`
