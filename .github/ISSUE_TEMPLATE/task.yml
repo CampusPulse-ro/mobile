@@ -24,8 +24,7 @@ body:
     attributes:
       label: Acceptance criteria
       description: How we know it's done. Each one checkable.
-      value: |
-        - [ ]
+      value: "- [ ] \n"
     validations:
       required: true
   - type: textarea

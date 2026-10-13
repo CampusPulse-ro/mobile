@@ -53,8 +53,8 @@ Dev build: `eas build --profile development --platform android|ios`
 
 ## Checks
 
-`bun run lint` · `bun run typecheck` · `bun run doctor`. CI (`lint, typecheck &
-bundle`) also bundles the JS for iOS and Android.
+`bun run format` (`format:check` in CI) · `bun run lint` · `bun run typecheck` · `bun run doctor`.
+CI (`lint, typecheck & bundle`) runs them all and also bundles the JS for iOS and Android.
 
 ## Contributing
 

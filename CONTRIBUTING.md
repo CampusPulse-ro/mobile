@@ -29,12 +29,16 @@ All issues of the three repos are on the [CampusPulse board](https://github.com/
    - **Why**
    - **How I tested it**: which device, what you tapped, and a screenshot for anything visible
 6. The card moves to **In Review** by itself once the PR says `Closes #<n>`, and to **Done**
-   when it's merged. CI has to be green (lint, typecheck, bundle), and a PR needs one approval: Sebastian
-   reviews.
+   when it's merged. CI has to be green (format, lint, typecheck, bundle), and a PR needs one approval:
+   Sebastian reviews.
 7. Merging is **squash only**: the whole PR becomes one commit on `main`, titled with the PR
    title. So write a good PR title; individual commit messages matter less.
-8. After the merge: `git switch main && git pull`, then delete your local branch
-   (`git branch -d <name>`). GitHub deletes the remote one.
+8. After the merge, update `main` and delete your local branch (GitHub deletes the remote one):
+   ```bash
+   git switch main
+   git pull
+   git branch -d <name>
+   ```
 
 One issue = one PR = one thing. If it grows past roughly 300 changed lines, split the issue.
 
@@ -60,14 +64,24 @@ the same for everyone.
 - **Every screen that loads data shows four states:** loading, error (with a way to retry), empty
   ("no classes today"), and the data.
 - **Imports use the `@/` alias:** `import { Screen } from '@/components/ui'`.
-- **Formatting is Prettier's job:** run `bun run format` before committing; CI fails on unformatted
-  code. Don't hand-tune spacing or line breaks.
+- **Formatting is Prettier's job:** run `bun run format`, then `git add`, before committing; CI fails
+  on unformatted code. Don't hand-tune spacing or line breaks. With the recommended VS Code
+  extensions (`.vscode/extensions.json`), files are formatted on save.
+- **Old clone on Windows?** If `bun run format:check` lists files you didn't change, your clone has
+  Windows line endings from before `.gitattributes` existed: run `bun run format` once and commit.
 - **No new package without asking.** When one is agreed, install it with `bunx expo install <name>`,
   not `bun add`: Expo picks the version that matches our SDK.
 - **The backend is reached only through the generated API client** (being set up). Never a URL typed
   into a screen.
 - **No secrets in the code or the repo:** no passwords, tokens or `.env` files.
 - **Touch targets** are at least 44×44, and an icon-only button has an `accessibilityLabel`.
+
+## Dependency updates
+
+Dependabot opens grouped weekly PRs, but leaves Expo-managed packages alone: they move together
+with the Expo SDK (`bunx expo install --fix`). A Dependabot **security** PR on an Expo-managed
+package is the exception it can't skip: close it, and fix it instead by bumping `expo` to the SDK
+patch release that contains the fix, then running `bunx expo install --fix`.
 
 ## Before you open a PR
 
@@ -77,7 +91,7 @@ bun run lint
 bun run typecheck
 ```
 
-…and you ran it on a phone, looked at every screen you touched, and checked the loading, error and
+`git add` what `bun run format` changed, and you ran it on a phone, looked at every screen you touched, and checked the loading, error and
 empty states.
 
 ## Using AI

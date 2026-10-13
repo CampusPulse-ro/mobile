@@ -47,6 +47,7 @@ plain words. Keep each change small enough to read and test in a few minutes.
 9. **Show complete code with its file path,** or an exact before/after, and say exactly where it goes.
 10. **Never put secrets in code:** passwords, tokens, API keys.
 11. **Don't change** `app.json` identity (`ro.campuspulse.app`, scheme `campuspulse`), `eas.json`,
-    `.github/`, `modules/` or package versions. Those belong to Sebastian; tell me if a change there
+    `.github/`, `modules/`, `.prettierrc`, `.prettierignore`, `.editorconfig`, `.gitattributes`,
+    `.vscode/` or package versions. Those belong to Sebastian; tell me if a change there
     seems needed.
 12. **End every answer with how to check it works:** what to run, what to tap, and what I should see.

@@ -1,5 +1,7 @@
-# Weekly dependency updates, one grouped PR per ecosystem. Security fixes arrive on their own
-# (Dependabot security updates are on for the repo).
+# Weekly version updates, grouped. Security updates are on for the repo, and they do NOT honor the
+# name-only `ignore` entries below (only entries with explicit `versions`): a security PR on an
+# Expo-managed package still opens. Close it and bump `expo` to the SDK patch with the fix, then
+# `bunx expo install --fix` (CONTRIBUTING, "Dependency updates").
 version: 2
 updates:
   - package-ecosystem: bun
@@ -7,20 +9,31 @@ updates:
     schedule:
       interval: weekly
     groups:
+      # Prettier on its own: a new version can reformat files, which belongs in its own PR.
+      prettier:
+        patterns: ['prettier']
       dependencies:
         patterns: ['*']
-    # Expo-managed packages move with the SDK: bump them with `bunx expo install --fix` during an
-    # SDK upgrade, never one at a time (expo-doctor would fail on a mismatched version).
+        exclude-patterns: ['prettier']
+        update-types: ['minor', 'patch']
+    # Expo-managed packages move with the SDK (node_modules/expo/bundledNativeModules.json pins
+    # them): bump them with `bunx expo install --fix` during an SDK upgrade, never one at a time,
+    # or expo-doctor fails on a mismatched version. Dependabot's `*` also matches across `/`.
     ignore:
       - dependency-name: expo
       - dependency-name: 'expo-*'
+      - dependency-name: '*-expo'
       - dependency-name: '@expo/*'
-      - dependency-name: react-native
-      - dependency-name: 'react-native-*'
-      - dependency-name: '@react-native/*'
+      - dependency-name: '*react-native*'
       - dependency-name: react
       - dependency-name: react-dom
       - dependency-name: '@types/react'
+      - dependency-name: '@types/react-dom'
+      - dependency-name: '@shopify/flash-list'
+      - dependency-name: 'metro*'
+      - dependency-name: babel-preset-expo
+      - dependency-name: jest
+      - dependency-name: '@types/jest'
       - dependency-name: typescript
 
   - package-ecosystem: github-actions
