@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: lint, typecheck & bundle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      # Dependency versions vs the SDK, config validity, duplicate native modules.
+      - name: Expo Doctor
+        run: bunx expo-doctor@latest
+
+      # Bundles the JS for both platforms exactly as a build would — catches a bad
+      # import or a missing asset that tsc can't see — without a native build.
+      - name: Bundle (iOS + Android)
+        run: bunx expo export --platform ios --platform android --output-dir dist
