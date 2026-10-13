@@ -1,0 +1,29 @@
+{
+  "tabs": {
+    "today": "Azi",
+    "timetable": "Orar",
+    "map": "Hartă",
+    "profile": "Profil"
+  },
+  "today": {
+    "title": "Azi",
+    "about": "Cursurile și termenele tale de azi."
+  },
+  "timetable": {
+    "title": "Orar",
+    "about": "Cursurile și laboratoarele tale din fiecare săptămână."
+  },
+  "map": {
+    "title": "Hartă",
+    "about": "Clădirile și sălile din campus."
+  },
+  "profile": {
+    "title": "Profil",
+    "about": "Contul tău și serviciile conectate.",
+    "language": "Limbă"
+  },
+  "language": {
+    "en": "English",
+    "ro": "Română"
+  }
+}

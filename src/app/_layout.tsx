@@ -1,7 +1,12 @@
 import { DarkTheme, Stack, ThemeProvider } from 'expo-router'
+import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
+import { useEffect, useState } from 'react'
 
+import { loadSavedLanguage } from '@/i18n'
 import { color } from '@/theme'
+
+void SplashScreen.preventAutoHideAsync()
 
 const theme = {
   ...DarkTheme,
@@ -16,6 +21,20 @@ const theme = {
 }
 
 export default function RootLayout() {
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    void loadSavedLanguage().finally(() => setReady(true))
+  }, [])
+
+  useEffect(() => {
+    if (ready) void SplashScreen.hideAsync()
+  }, [ready])
+
+  // Keep the splash up until the saved language is applied: rendering earlier would
+  // flash English at someone who picked Romanian.
+  if (!ready) return null
+
   return (
     <ThemeProvider value={theme}>
       <StatusBar style="light" />

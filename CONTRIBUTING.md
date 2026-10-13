@@ -49,6 +49,7 @@ One issue = one PR = one thing. If it grows past roughly 300 changed lines, spli
 | `src/app/`        | Screens. expo-router turns each file into a route; `(tabs)/` holds the tab screens                       |
 | `src/components/` | Pieces used by more than one screen. `ui.tsx` has the basics (`Screen`, `Title`, `Muted`, `Placeholder`) |
 | `src/theme.ts`    | Colors, spacing and corner radius. The only place colors are defined                                     |
+| `src/i18n/`       | Every user-facing text, in `en.json` and `ro.json`; date and time formatting in `format.ts`              |
 | `modules/`        | Native code (Kotlin/Swift). Sebastian's area                                                             |
 
 A new top-level folder (for example `src/api/` or `src/hooks/`): ask first, so the structure stays
@@ -58,6 +59,10 @@ the same for everyone.
 
 - **TypeScript stays strict.** No `any`, no `@ts-ignore`, no turning off lint rules. If the types
   fight you, that's a question to ask, not a rule to switch off.
+- **No user-facing text written directly in components.** Add a key to both `src/i18n/en.json`
+  and `src/i18n/ro.json` and use `t('section.key')` (`useTranslation()` from `react-i18next`). A key
+  missing from `ro.json` fails the typecheck. English is the default; students switch on Profile.
+  Dates and times: `formatDate` / `formatTime` from `src/i18n/format.ts`.
 - **Styling uses the tokens in `src/theme.ts`** (`color.page`, `space.md`, `radius.lg`...), never a
   hex color written in a screen. That keeps a later light theme (or any palette change) a
   one-file change.

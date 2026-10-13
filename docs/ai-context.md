@@ -26,6 +26,7 @@ plain words. Keep each change small enough to read and test in a few minutes.
 | `src/app/_layout.tsx`   | Root layout: navigation theme and stack                                                 |
 | `src/components/ui.tsx` | Shared building blocks: `Screen`, `Title`, `Muted`, `Placeholder`                       |
 | `src/theme.ts`          | Design tokens: `color`, `space`, `radius`. The only place colors are defined            |
+| `src/i18n/`             | Translations: `en.json`, `ro.json` (same keys), `index.ts` (setup), `format.ts` (dates) |
 | `modules/`              | Native Kotlin/Swift modules                                                             |
 | `app.json`, `eas.json`  | App identity and build profiles                                                         |
 
@@ -35,19 +36,23 @@ plain words. Keep each change small enough to read and test in a few minutes.
    the closest existing one and match it.
 2. **Style only with the tokens from `src/theme.ts`.** No hex colors or magic numbers in screens.
 3. **Screens that load data handle four states:** loading, error with retry, empty, and data.
-4. **No new packages unless I ask.** If one is truly needed, say so and why, and use
+4. **No user-facing text written directly in components.** Every text is a key added to BOTH
+   `src/i18n/en.json` and `src/i18n/ro.json` (Romanian with diacritics: ș ț ă î â), used with
+   `const { t } = useTranslation()` and `t('section.key')`. English is the default language.
+   Dates and times go through `formatDate` / `formatTime` from `src/i18n/format.ts`.
+5. **No new packages unless I ask.** If one is truly needed, say so and why, and use
    `bunx expo install <name>` so the version matches Expo SDK 57.
-5. **The backend is called only through the generated API client.** Never `fetch` with a URL written
+6. **The backend is called only through the generated API client.** Never `fetch` with a URL written
    by hand. If the client or the endpoint you need doesn't exist yet, say so; do not invent one.
-6. **Don't invent APIs.** If you are not sure a prop, function or library exists in Expo SDK 57 /
+7. **Don't invent APIs.** If you are not sure a prop, function or library exists in Expo SDK 57 /
    React Native 0.86, say that you are not sure.
-7. **Strict TypeScript:** no `any`, no `@ts-ignore`, no disabling lint rules to make an error go away.
-8. **Imports use the `@/` alias** (`@/components/ui`, `@/theme`). Formatting is done by Prettier
+8. **Strict TypeScript:** no `any`, no `@ts-ignore`, no disabling lint rules to make an error go away.
+9. **Imports use the `@/` alias** (`@/components/ui`, `@/theme`). Formatting is done by Prettier
    (`bun run format`), so don't spend effort on spacing or line breaks.
-9. **Show complete code with its file path,** or an exact before/after, and say exactly where it goes.
-10. **Never put secrets in code:** passwords, tokens, API keys.
-11. **Don't change** `app.json` identity (`ro.campuspulse.app`, scheme `campuspulse`), `eas.json`,
+10. **Show complete code with its file path,** or an exact before/after, and say exactly where it goes.
+11. **Never put secrets in code:** passwords, tokens, API keys.
+12. **Don't change** `app.json` identity (`ro.campuspulse.app`, scheme `campuspulse`), `eas.json`,
     `.github/`, `modules/`, `.prettierrc`, `.prettierignore`, `.editorconfig`, `.gitattributes`,
     `.vscode/` or package versions. Those belong to Sebastian; tell me if a change there
     seems needed.
-12. **End every answer with how to check it works:** what to run, what to tap, and what I should see.
+13. **End every answer with how to check it works:** what to run, what to tap, and what I should see.
