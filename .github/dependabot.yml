@@ -1,0 +1,32 @@
+# Weekly dependency updates, one grouped PR per ecosystem. Security fixes arrive on their own
+# (Dependabot security updates are on for the repo).
+version: 2
+updates:
+  - package-ecosystem: bun
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      dependencies:
+        patterns: ['*']
+    # Expo-managed packages move with the SDK: bump them with `bunx expo install --fix` during an
+    # SDK upgrade, never one at a time (expo-doctor would fail on a mismatched version).
+    ignore:
+      - dependency-name: expo
+      - dependency-name: 'expo-*'
+      - dependency-name: '@expo/*'
+      - dependency-name: react-native
+      - dependency-name: 'react-native-*'
+      - dependency-name: '@react-native/*'
+      - dependency-name: react
+      - dependency-name: react-dom
+      - dependency-name: '@types/react'
+      - dependency-name: typescript
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ['*']

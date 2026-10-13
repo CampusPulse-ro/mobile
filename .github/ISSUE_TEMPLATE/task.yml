@@ -1,6 +1,6 @@
 name: Task
 description: A piece of work that becomes one pull request
-projects: ["CampusPulse-ro/1"]
+projects: ['CampusPulse-ro/1']
 body:
   - type: textarea
     id: goal
@@ -25,7 +25,7 @@ body:
       label: Acceptance criteria
       description: How we know it's done. Each one checkable.
       value: |
-        - [ ] 
+        - [ ]
     validations:
       required: true
   - type: textarea

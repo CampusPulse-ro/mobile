@@ -40,12 +40,12 @@ One issue = one PR = one thing. If it grows past roughly 300 changed lines, spli
 
 ## Where things go
 
-| Path | What goes there |
-|---|---|
-| `src/app/` | Screens. expo-router turns each file into a route; `(tabs)/` holds the tab screens |
+| Path              | What goes there                                                                                          |
+| ----------------- | -------------------------------------------------------------------------------------------------------- |
+| `src/app/`        | Screens. expo-router turns each file into a route; `(tabs)/` holds the tab screens                       |
 | `src/components/` | Pieces used by more than one screen. `ui.tsx` has the basics (`Screen`, `Title`, `Muted`, `Placeholder`) |
-| `src/theme.ts` | Colors, spacing and corner radius. The only place colors are defined |
-| `modules/` | Native code (Kotlin/Swift). Sebastian's area |
+| `src/theme.ts`    | Colors, spacing and corner radius. The only place colors are defined                                     |
+| `modules/`        | Native code (Kotlin/Swift). Sebastian's area                                                             |
 
 A new top-level folder (for example `src/api/` or `src/hooks/`): ask first, so the structure stays
 the same for everyone.
@@ -60,6 +60,8 @@ the same for everyone.
 - **Every screen that loads data shows four states:** loading, error (with a way to retry), empty
   ("no classes today"), and the data.
 - **Imports use the `@/` alias:** `import { Screen } from '@/components/ui'`.
+- **Formatting is Prettier's job:** run `bun run format` before committing; CI fails on unformatted
+  code. Don't hand-tune spacing or line breaks.
 - **No new package without asking.** When one is agreed, install it with `bunx expo install <name>`,
   not `bun add`: Expo picks the version that matches our SDK.
 - **The backend is reached only through the generated API client** (being set up). Never a URL typed
@@ -70,6 +72,7 @@ the same for everyone.
 ## Before you open a PR
 
 ```bash
+bun run format
 bun run lint
 bun run typecheck
 ```

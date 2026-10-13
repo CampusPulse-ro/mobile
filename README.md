@@ -11,13 +11,13 @@ Bun · oxlint.
 
 ## Layout
 
-| Path | What |
-|---|---|
-| `src/app/` | Routes. `_layout` sets the navigation theme; `(tabs)/` = Today, Timetable, Map, Profile (placeholders) |
-| `src/components/ui.tsx` | Shared building blocks (`Screen`, `Title`, `Muted`, `Placeholder`) |
-| `src/theme.ts` | Design tokens (colors, spacing, radius), the same names and values as the web app |
-| `modules/` | Custom native modules (Swift/Kotlin); see its README |
-| `assets/images/` | Placeholder icon and splash ("CP" lettermark) |
+| Path                    | What                                                                                                   |
+| ----------------------- | ------------------------------------------------------------------------------------------------------ |
+| `src/app/`              | Routes. `_layout` sets the navigation theme; `(tabs)/` = Today, Timetable, Map, Profile (placeholders) |
+| `src/components/ui.tsx` | Shared building blocks (`Screen`, `Title`, `Muted`, `Placeholder`)                                     |
+| `src/theme.ts`          | Design tokens (colors, spacing, radius), the same names and values as the web app                      |
+| `modules/`              | Custom native modules (Swift/Kotlin); see its README                                                   |
+| `assets/images/`        | Placeholder icon and splash ("CP" lettermark)                                                          |
 
 `ios/` and `android/` are **not committed**: `expo prebuild` generates them from
 `app.json` + config plugins (Continuous Native Generation), and EAS does that on every build.
