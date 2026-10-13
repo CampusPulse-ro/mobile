@@ -35,6 +35,12 @@ jobs:
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: bun run lint
 
+      # Romanian uses ș ț with a comma below; ş ţ (cedilla) are a different, wrong letter that
+      # keyboards and AI tools often produce.
+      - name: Romanian diacritics
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: "! LC_ALL=C.UTF-8 grep -n '[şţŞŢ]' src/i18n/ro.json"
+
       - name: Typecheck
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: bun run typecheck

@@ -1,0 +1,29 @@
+{
+  "tabs": {
+    "today": "Today",
+    "timetable": "Timetable",
+    "map": "Map",
+    "profile": "Profile"
+  },
+  "today": {
+    "title": "Today",
+    "about": "Your classes and deadlines for today."
+  },
+  "timetable": {
+    "title": "Timetable",
+    "about": "Your weekly courses and labs."
+  },
+  "map": {
+    "title": "Map",
+    "about": "Campus buildings and rooms."
+  },
+  "profile": {
+    "title": "Profile",
+    "about": "Your account and connected services.",
+    "language": "Language"
+  },
+  "language": {
+    "en": "English",
+    "ro": "Română"
+  }
+}

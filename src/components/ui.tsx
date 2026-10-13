@@ -28,14 +28,26 @@ export function Muted({ children, style }: { children: ReactNode; style?: StyleP
   return <Text style={[styles.muted, style]}>{children}</Text>
 }
 
-/** A placeholder screen: the tab's title and one line saying what will live there. */
-export function Placeholder({ title, about }: { title: string; about: string }) {
+/**
+ * A placeholder screen: the tab's title, one line saying what will live there, and
+ * whatever already works on it (children) below.
+ */
+export function Placeholder({
+  title,
+  about,
+  children,
+}: {
+  title: string
+  about: string
+  children?: ReactNode
+}) {
   return (
     <Screen>
       <View style={styles.header}>
         <Title>{title}</Title>
         <Muted>{about}</Muted>
       </View>
+      {children ? <View style={styles.content}>{children}</View> : null}
     </Screen>
   )
 }
@@ -43,6 +55,7 @@ export function Placeholder({ title, about }: { title: string; about: string }) 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: color.page },
   header: { paddingHorizontal: space.xl, paddingTop: space.lg, gap: space.xs },
+  content: { paddingHorizontal: space.xl, paddingTop: space.xl, gap: space.md },
   title: { color: color.ink, fontSize: 28, fontWeight: '700' },
   muted: { color: color.inkMuted, fontSize: 15 },
 })

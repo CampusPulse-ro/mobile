@@ -44,12 +44,13 @@ One issue = one PR = one thing. If it grows past roughly 300 changed lines, spli
 
 ## Where things go
 
-| Path              | What goes there                                                                                          |
-| ----------------- | -------------------------------------------------------------------------------------------------------- |
-| `src/app/`        | Screens. expo-router turns each file into a route; `(tabs)/` holds the tab screens                       |
-| `src/components/` | Pieces used by more than one screen. `ui.tsx` has the basics (`Screen`, `Title`, `Muted`, `Placeholder`) |
-| `src/theme.ts`    | Colors, spacing and corner radius. The only place colors are defined                                     |
-| `modules/`        | Native code (Kotlin/Swift). Sebastian's area                                                             |
+| Path              | What goes there                                                                                              |
+| ----------------- | ------------------------------------------------------------------------------------------------------------ |
+| `src/app/`        | Screens. expo-router turns each file into a route; `(tabs)/` holds the tab screens                           |
+| `src/components/` | Pieces used by more than one screen. `ui.tsx` has the basics (`Screen`, `Title`, `Muted`, `Placeholder`)     |
+| `src/theme.ts`    | Colors, spacing and corner radius. The only place colors are defined                                         |
+| `src/i18n/`       | Every user-facing text, in `en.json` and `ro.json`; dates and times via `useDateTimeFormat()` in `format.ts` |
+| `modules/`        | Native code (Kotlin/Swift). Sebastian's area                                                                 |
 
 A new top-level folder (for example `src/api/` or `src/hooks/`): ask first, so the structure stays
 the same for everyone.
@@ -58,6 +59,13 @@ the same for everyone.
 
 - **TypeScript stays strict.** No `any`, no `@ts-ignore`, no turning off lint rules. If the types
   fight you, that's a question to ask, not a rule to switch off.
+- **No user-facing text written directly in components,** props included (`accessibilityLabel`,
+  `placeholder`): add a key to both `src/i18n/en.json` and `src/i18n/ro.json` and use
+  `t('section.key')` (`useTranslation()` from `react-i18next`). A key in only one of the files, or
+  a `t()` key that doesn't exist, fails the typecheck; text written as JSX children fails lint.
+  Romanian: ș ț with a comma below, never ş ţ (CI checks). Language names (`language.*`) stay in
+  their own language in both files. English is the default; students switch on Profile. Dates and
+  times: `useDateTimeFormat()` from `src/i18n/format.ts`.
 - **Styling uses the tokens in `src/theme.ts`** (`color.page`, `space.md`, `radius.lg`...), never a
   hex color written in a screen. That keeps a later light theme (or any palette change) a
   one-file change.
