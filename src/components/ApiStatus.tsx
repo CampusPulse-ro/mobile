@@ -15,13 +15,18 @@ export function ApiStatus() {
   }
 
   if (readiness.isError) {
-    // A 503 means the API answered but its database didn't; anything else is the network.
-    const notReady = readiness.error instanceof ApiError && readiness.error.status === 503
+    // An ApiError means the server answered: 503 is "up, but no database"; any other status is a
+    // server-side error. Anything else (no connection, DNS, a timeout) never reached the server.
+    const error = readiness.error
+    const message =
+      error instanceof ApiError
+        ? error.status === 503
+          ? t('api.notReady')
+          : t('api.serverError')
+        : t('api.unreachable')
     return (
       <View style={styles.row}>
-        <Text style={[styles.line, styles.problem]}>
-          {notReady ? t('api.notReady') : t('api.unreachable')}
-        </Text>
+        <Text style={[styles.line, styles.problem]}>{message}</Text>
         <Pressable
           accessibilityRole="button"
           onPress={() => void readiness.refetch()}

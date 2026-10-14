@@ -1,4 +1,5 @@
-import { QueryClient } from '@tanstack/react-query'
+import { focusManager, QueryClient } from '@tanstack/react-query'
+import { AppState, Platform } from 'react-native'
 
 /** One cache for the whole app; provided in the root layout. */
 export const queryClient = new QueryClient({
@@ -10,3 +11,9 @@ export const queryClient = new QueryClient({
     },
   },
 })
+
+// React Native has no window focus: tell TanStack Query when the app comes back to the
+// foreground, so stale data refreshes on resume. Set up once, with the client.
+if (Platform.OS !== 'web') {
+  AppState.addEventListener('change', (status) => focusManager.setFocused(status === 'active'))
+}

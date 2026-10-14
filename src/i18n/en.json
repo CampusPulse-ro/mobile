@@ -30,6 +30,7 @@
     "checking": "Checking the server…",
     "ready": "Server is up",
     "notReady": "The server answers, but its database doesn't",
+    "serverError": "The server ran into a problem",
     "unreachable": "Can't reach the server",
     "retry": "Try again"
   }

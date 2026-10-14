@@ -108,6 +108,10 @@ How screens call it: CONTRIBUTING, "Calling the API".
 - Cut one with `gh release create vX.Y.Z --generate-notes`; the notes are grouped by label
   (`.github/release.yml`): features, fixes, dependencies, other.
 
+Before a production build, run `bun run api:check:prod`: it checks that the committed API types match
+the contract the **prod** API serves. If it fails, the app uses an endpoint prod doesn't have yet:
+release the API first.
+
 ## Checks
 
 `bun run format` (`format:check` in CI) · `bun run lint` · `bun run typecheck` · `bun run doctor`.

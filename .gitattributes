@@ -11,3 +11,6 @@
 *.otf binary
 *.woff binary
 *.woff2 binary
+
+# Generated from the API's OpenAPI contract (bun run api:types); collapsed in PR diffs.
+src/api/schema.d.ts linguist-generated=true

@@ -53,7 +53,8 @@
     "doctor": "bunx expo-doctor",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "api:types": "openapi-typescript https://raw.githubusercontent.com/CampusPulse-ro/api/main/openapi/v1.json -o src/api/schema.d.ts"
+    "api:types": "openapi-typescript https://raw.githubusercontent.com/CampusPulse-ro/api/main/openapi/v1.json -o src/api/schema.d.ts",
+    "api:check:prod": "openapi-typescript https://campuspulse-api.thorsp.net/openapi/v1.json -o src/api/schema.d.ts --check"
   },
   "private": true
 }

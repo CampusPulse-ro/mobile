@@ -111,11 +111,29 @@ in a path or a wrong field is a type error, not a bug on a phone.
    }
    ```
 
-3. **The screen uses the hook** and shows all four states. `src/components/ApiStatus.tsx` is the
-   example: `isPending` → loading, `isError` → a message and a way to try again, then the data.
+3. **The screen uses the hook** and shows all four states (`src/components/ApiStatus.tsx` is the
+   example):
+   - **loading:** `isPending`;
+   - **error:** `isError` → a message and a way to try again. Show the error screen only when there
+     is no data yet (`isError && !data`); if old data is on screen, keep it and add a small "couldn't
+     refresh" note;
+   - **empty:** an empty list → the empty state ("no classes today"). The health example has none;
+   - **data.**
 
-`unwrap` turns an API error response into an `ApiError` (with its `status`), so a 503 and a network
-failure can show different messages. Which API a build talks to is in `src/config.ts`.
+`unwrap` turns any non-2xx response into an `ApiError` (with its `status`), so "the server answered
+with an error" and "never reached the server" (no connection, a timeout after 15 s) can show
+different messages. Which API a build talks to is in `src/config.ts`. Data refreshes when the app
+comes back to the foreground.
+
+**When the API changes:**
+
+- A new endpoint reaches **stage** when its API PR merges, and **prod** only at the API's next
+  release. Regenerate with `bun run api:types` (it reads the API's `main`), and wait about 5 minutes
+  after an API merge first: GitHub caches the raw file.
+- Before a production build, `bun run api:check:prod` checks the committed types against the
+  contract prod actually serves (see the README's Releasing section).
+- `openapi-typescript` warns that it wants TypeScript 5; that warning is harmless. Don't downgrade
+  TypeScript.
 
 ## Before you open a PR
 

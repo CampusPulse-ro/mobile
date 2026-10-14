@@ -30,6 +30,7 @@
     "checking": "Se verifică serverul…",
     "ready": "Serverul funcționează",
     "notReady": "Serverul răspunde, dar baza lui de date nu",
+    "serverError": "Serverul a întâmpinat o problemă",
     "unreachable": "Serverul nu poate fi contactat",
     "retry": "Încearcă din nou"
   }
