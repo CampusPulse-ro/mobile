@@ -25,7 +25,8 @@ plain words. Keep each change small enough to read and test in a few minutes.
 | `src/app/`              | Screens. Each file is a route (expo-router). `(tabs)/` = Today, Timetable, Map, Profile                                                                           |
 | `src/app/_layout.tsx`   | Root layout: navigation theme and stack                                                                                                                           |
 | `src/components/ui.tsx` | Shared building blocks: `Screen`, `Title`, `Muted`, `Placeholder`                                                                                                 |
-| `src/theme.ts`          | Design tokens: `color`, `space`, `radius`. The only place colors are defined                                                                                      |
+| `src/theme.ts`          | Design tokens: `color`, `space`, `radius`, generated from the web repo's `design/tokens.json` (`bun run design:tokens`; never edit)                               |
+| `src/design/`           | `tokens.json` (copy of web's) and the generated `tokens.ts`. Never edit                                                                                           |
 | `src/i18n/`             | Translations: `en.json`, `ro.json` (same keys), `index.ts` (setup), `format.ts` (`useDateTimeFormat`)                                                             |
 | `src/api/`              | API client (`client.ts`, `unwrap`, `ApiError`), generated types `schema.d.ts` (never edit), one TanStack Query hook per kind of data (`health.ts` is the example) |
 | `modules/`              | Native Kotlin/Swift modules                                                                                                                                       |
@@ -36,6 +37,8 @@ plain words. Keep each change small enough to read and test in a few minutes.
 1. **Follow the existing patterns.** Before writing a new screen or component, look at (or ask for)
    the closest existing one and match it.
 2. **Style only with the tokens from `src/theme.ts`.** No hex colors or magic numbers in screens.
+   They're generated (never edit `src/theme.ts` or `src/design/`); component names and variants come
+   from `docs/design-system.md`.
 3. **Screens that load data handle four states:** loading, error with retry, empty, and data.
 4. **No user-facing text written directly in components,** and that includes props such as
    `accessibilityLabel` and `placeholder` (oxlint's `react/jsx-no-literals` only catches text

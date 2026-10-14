@@ -5,3 +5,6 @@ ios
 android
 bun.lock
 src/api/schema.d.ts
+# design tokens: a byte-for-byte copy of web's design/tokens.json, and the code generated from it
+src/design/tokens.json
+src/design/tokens.ts
