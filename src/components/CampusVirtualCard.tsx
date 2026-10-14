@@ -63,11 +63,18 @@ export function CampusVirtualCard() {
           <Muted style={styles.problem}>
             {state.problem === 'refused'
               ? t('campusVirtual.errorRefused')
-              : t('campusVirtual.errorUnreachable')}
+              : state.problem === 'rejected'
+                ? t('campusVirtual.errorRejected', { code: state.code })
+                : t('campusVirtual.errorUnreachable')}
           </Muted>
           <Button
             label={t('campusVirtual.retry')}
             onPress={() => void (state.problem === 'refused' ? connect() : retry())}
+          />
+          <Button
+            label={t('campusVirtual.disconnect')}
+            variant="secondary"
+            onPress={() => void disconnect()}
           />
         </>
       ) : null}

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import {
+  CampusVirtualError,
   CampusVirtualExpiredError,
   connect as connectAccount,
   disconnect as disconnectAccount,
@@ -15,15 +16,18 @@ export type CampusVirtualState =
   | { status: 'connected'; fullname: string }
   | { status: 'expired' }
   | { status: 'error'; problem: 'unreachable' | 'refused' }
+  | { status: 'error'; problem: 'rejected'; code: string }
 
 function fromInfo(info: SiteInfo | null): CampusVirtualState {
   return info ? { status: 'connected', fullname: info.fullname } : { status: 'disconnected' }
 }
 
 function fromError(error: unknown): CampusVirtualState {
-  return error instanceof CampusVirtualExpiredError
-    ? { status: 'expired' }
-    : { status: 'error', problem: 'unreachable' }
+  if (error instanceof CampusVirtualExpiredError) return { status: 'expired' }
+  if (error instanceof CampusVirtualError && error.kind === 'rejected') {
+    return { status: 'error', problem: 'rejected', code: error.code }
+  }
+  return { status: 'error', problem: 'unreachable' }
 }
 
 /** The Campus Virtual connection as a screen needs it: loading, error, empty and data. */

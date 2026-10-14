@@ -7,19 +7,21 @@
  * Moodle redirects to `campuspulse://token=<base64>`, where the base64 decodes to
  * `siteid:::token[:::privatetoken]` and `siteid` = md5(site URL + passport).
  */
+import { uuid } from 'expo-modules-core'
+
 import { md5 } from './md5'
 
 export const SITE_URL = 'https://cv.upt.ro'
 export const REDIRECT_PREFIX = 'campuspulse://'
 
 /**
- * A nonce that binds the redirect to this attempt: a token whose siteid wasn't made from it is
- * refused. It is not a secret, so Math.random is enough (the app has no native crypto module).
+ * The passport binds the redirect to this attempt: the app keeps a token only if its siteid is
+ * md5(site URL + passport). The site URL is public, so the passport's unpredictability IS what
+ * makes that check mean anything; it comes from the platform's secure random generator
+ * (expo-modules-core's native uuid v4: 122 random bits).
  */
 export function newPassport(): string {
-  let passport = Date.now().toString(16)
-  while (passport.length < 32) passport += Math.floor(Math.random() * 16).toString(16)
-  return passport.slice(0, 32)
+  return uuid.v4().replace(/-/g, '')
 }
 
 export function launchUrl(passport: string): string {

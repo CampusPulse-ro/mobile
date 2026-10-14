@@ -35,10 +35,16 @@
     "reconnect": "Reconnect",
     "errorUnreachable": "Couldn't reach Campus Virtual. Check your internet connection and try again.",
     "errorRefused": "The sign-in couldn't be verified, so nothing was saved. Try again.",
+    "errorRejected": "Campus Virtual turned the request down ({{code}}). Try again later, or disconnect and connect again.",
     "retry": "Try again"
   },
   "language": {
     "en": "English",
     "ro": "Română"
+  },
+  "notFound": {
+    "title": "Nothing here",
+    "about": "This link doesn't open anything in CampusPulse.",
+    "home": "Go to Today"
   }
 }
