@@ -34,6 +34,8 @@ updates:
       - dependency-name: babel-preset-expo
       - dependency-name: jest
       - dependency-name: '@types/jest'
+      # Also: TypeScript 7 no longer ships the compiler API openapi-typescript needs (`api:types`;
+      # CI's "API types generator runs" step catches it, #19). Stay on 6 until it supports 7.
       - dependency-name: typescript
 
   - package-ecosystem: github-actions
