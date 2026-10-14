@@ -44,14 +44,14 @@ One issue = one PR = one thing. If it grows past roughly 300 changed lines, spli
 
 ## Where things go
 
-| Path              | What goes there                                                                                                 |
-| ----------------- | --------------------------------------------------------------------------------------------------------------- |
-| `src/app/`        | Screens. expo-router turns each file into a route; `(tabs)/` holds the tab screens                              |
-| `src/components/` | Pieces used by more than one screen. `ui.tsx` has the basics (`Screen`, `Title`, `Muted`, `Placeholder`)        |
-| `src/theme.ts`    | Colors, spacing and corner radius. The only place colors are defined                                            |
-| `src/i18n/`       | Every user-facing text, in `en.json` and `ro.json`; dates and times via `useDateTimeFormat()` in `format.ts`    |
-| `src/api/`        | The API client (`client.ts`), generated types (`schema.d.ts`, never edit by hand) and one hook per kind of data |
-| `modules/`        | Native code (Kotlin/Swift). Sebastian's area                                                                    |
+| Path              | What goes there                                                                                                                        |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/app/`        | Screens. expo-router turns each file into a route; `(tabs)/` holds the tab screens                                                     |
+| `src/components/` | Pieces used by more than one screen. `ui.tsx` has the basics (`Screen`, `Title`, `Muted`, `Placeholder`)                               |
+| `src/theme.ts`    | Colors, spacing and corner radius, generated from the web repo's `design/tokens.json` ([docs/design-system.md](docs/design-system.md)) |
+| `src/i18n/`       | Every user-facing text, in `en.json` and `ro.json`; dates and times via `useDateTimeFormat()` in `format.ts`                           |
+| `src/api/`        | The API client (`client.ts`), generated types (`schema.d.ts`, never edit by hand) and one hook per kind of data                        |
+| `modules/`        | Native code (Kotlin/Swift). Sebastian's area                                                                                           |
 
 A new top-level folder (for example `src/hooks/`): ask first, so the structure stays
 the same for everyone.
@@ -69,7 +69,8 @@ the same for everyone.
   times: `useDateTimeFormat()` from `src/i18n/format.ts`.
 - **Styling uses the tokens in `src/theme.ts`** (`color.page`, `space.md`, `radius.lg`...), never a
   hex color written in a screen. That keeps a later light theme (or any palette change) a
-  one-file change.
+  one-file change. The tokens are generated from the web repo's `design/tokens.json`: see
+  [docs/design-system.md](docs/design-system.md) for how to change one and what components are called.
 - **Every screen that loads data shows four states:** loading, error (with a way to retry), empty
   ("no classes today"), and the data.
 - **Imports use the `@/` alias:** `import { Screen } from '@/components/ui'`.

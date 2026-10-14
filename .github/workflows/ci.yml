@@ -45,6 +45,15 @@ jobs:
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: bun run typecheck
 
+      # The theme is generated from src/design/tokens.json, a copy of the web repo's design/tokens.json
+      # (docs/design-system.md). Regenerating from the committed copy, with no network, must change
+      # nothing: this fails on a hand-edited tokens.ts or a copy committed without regenerating.
+      - name: Design tokens match
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          bun scripts/design-tokens.mjs --offline
+          git diff --exit-code -- src/design/tokens.ts
+
       # `bun run api:types` writes src/api/schema.d.ts from the contract on the API's main, which
       # moves on its own, so this can't diff against the committed file. It checks the generator still
       # runs: TypeScript 7 removed the compiler API openapi-typescript uses (#19).
