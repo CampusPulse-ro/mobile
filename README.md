@@ -29,7 +29,8 @@ Bun · oxlint.
   published, so change it before the first store build if the domain changes.
 - URL scheme `campuspulse`: the Campus Virtual sign-in hands the app its token at
   `campuspulse://token=…`.
-- No EAS project yet: `eas init` adds `owner` and `extra.eas.projectId` to `app.json`.
+- EAS project [`@thorsp/campuspulse`](https://expo.dev/accounts/thorsp/projects/campuspulse) (`owner` and
+  `extra.eas.projectId` in `app.json`). Android signing credentials live on Expo's servers.
 
 ## Prerequisites
 
@@ -51,9 +52,28 @@ Expo Go works while there are no custom native modules.
 A dev build made before i18n (#11) lacks AsyncStorage, which the saved language uses: build a
 fresh dev client after pulling. Expo Go already has it.
 
-Dev build: `eas build --profile development --platform android|ios`
-(`development-simulator` for the iOS simulator), or locally with `bun run android`
-(Android SDK) / `bun run ios` (Mac + Xcode).
+### Development build
+
+A development build is the app with our native code and the dev menu, installed on the phone like a
+normal app; it loads the JavaScript from `bun start`.
+
+- **Install it:** open the latest Android development build on
+  [expo.dev → Builds](https://expo.dev/accounts/thorsp/projects/campuspulse/builds) on the phone and
+  tap **Install** (or scan its QR code). Android asks to allow installing from the browser once.
+- **Make a new one** (after a native change, e.g. a new native package):
+  `eas build -p android --profile development` (`development-simulator` for the iOS simulator), or
+  locally with `bun run android` (Android SDK) / `bun run ios` (Mac + Xcode).
+
+### Which build talks to which API
+
+| Build                                             | API                                               |
+| ------------------------------------------------- | ------------------------------------------------- |
+| Expo Go / `bun start` (no `EXPO_PUBLIC_API_BASE`) | stage, `https://campuspulse-api-stage.thorsp.net` |
+| EAS `development`, `preview`                      | stage                                             |
+| EAS `production`                                  | prod, `https://campuspulse-api.thorsp.net`        |
+
+The URL comes from `EXPO_PUBLIC_API_BASE` per profile in `eas.json`, read in `src/config.ts`. Never
+write an API URL anywhere else.
 
 ## Checks
 
