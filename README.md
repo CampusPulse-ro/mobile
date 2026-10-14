@@ -96,6 +96,26 @@ URL anywhere else.
 - Cut one with `gh release create vX.Y.Z --generate-notes`; the notes are grouped by label
   (`.github/release.yml`): features, fixes, dependencies, other.
 
+## Campus Virtual
+
+Profile can connect the student's own Campus Virtual (cv.upt.ro) account. Code: `src/campusVirtual/`.
+
+- **How it signs in:** the app opens Campus Virtual's mobile sign-in page (`launch.php`, the same
+  flow the official Moodle app uses) in a browser tab. The student signs in with their UPT
+  Microsoft account there, so the app never sees the password. Campus Virtual sends the app a web
+  service token at `campuspulse://token=…`, and the app checks it belongs to the attempt it
+  started (`siteid` = md5(site URL + passport)) before keeping it.
+- **What's stored:** only that token, in the phone's secure storage (`expo-secure-store`, key
+  `campusVirtual.token`). It never goes to our API and is never logged. Disconnect forgets it on
+  the phone; it stays valid on UPT's side until it expires.
+- **Read-only:** the token is full access to the student's account (it could submit quizzes), so
+  `src/campusVirtual/client.ts` calls only the functions on its allow-list
+  (`core_webservice_get_site_info` for now). Add a function there only if it reads.
+- **Lifetime:** UPT's token duration (Moodle's default is 12 weeks). It can't be refreshed: when
+  Campus Virtual answers `invalidtoken`, the app forgets it and shows **Reconnect**.
+- **Which build:** the `campuspulse://` redirect needs a build that has that scheme, so test it on
+  the **dev build**, not Expo Go.
+
 ## Checks
 
 `bun run format` (`format:check` in CI) · `bun run lint` · `bun run typecheck` · `bun run doctor`.
