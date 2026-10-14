@@ -45,6 +45,13 @@ jobs:
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: bun run typecheck
 
+      # `bun run api:types` writes src/api/schema.d.ts from the contract on the API's main, which
+      # moves on its own, so this can't diff against the committed file. It checks the generator still
+      # runs: TypeScript 7 removed the compiler API openapi-typescript uses (#19).
+      - name: API types generator runs
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: bunx openapi-typescript https://raw.githubusercontent.com/CampusPulse-ro/api/main/openapi/v1.json -o "$RUNNER_TEMP/schema.d.ts"
+
       # Dependency versions vs the SDK, config validity, duplicate native modules.
       - name: Expo Doctor
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
