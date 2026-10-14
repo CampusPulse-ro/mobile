@@ -84,6 +84,18 @@ git) and restart `bun start`. A release bundle built outside `eas.json` with no 
 startup instead of quietly using stage. The URL is read only in `src/config.ts`; never write an API
 URL anywhere else.
 
+## Releasing
+
+- Tags are `vX.Y.Z` (semver). Only admins can create `v*` tags (a tag ruleset).
+- The app's `version` in `app.json` matches the release tag: bump it in the PR that prepares the
+  release.
+- Android version codes come from EAS automatically (`appVersionSource: "remote"`, `autoIncrement`
+  on the `production` profile), so they never collide.
+- **A GitHub Release does not build or submit the app yet.** Production builds and store submission
+  come with the Google Play decision.
+- Cut one with `gh release create vX.Y.Z --generate-notes`; the notes are grouped by label
+  (`.github/release.yml`): features, fixes, dependencies, other.
+
 ## Checks
 
 `bun run format` (`format:check` in CI) · `bun run lint` · `bun run typecheck` · `bun run doctor`.
