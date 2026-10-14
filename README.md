@@ -84,6 +84,18 @@ git) and restart `bun start`. A release bundle built outside `eas.json` with no 
 startup instead of quietly using stage. The URL is read only in `src/config.ts`; never write an API
 URL anywhere else.
 
+## API
+
+The app talks to the CampusPulse API through a typed client generated from the API's committed
+OpenAPI contract:
+
+```bash
+bun run api:types    # regenerate src/api/schema.d.ts from the api repo's main, then commit it
+```
+
+Which API a build uses: `src/config.ts` (stage for development and preview, prod for production).
+How screens call it: CONTRIBUTING, "Calling the API".
+
 ## Releasing
 
 - Tags are `vX.Y.Z` (semver). Only admins can create `v*` tags (a tag ruleset).
