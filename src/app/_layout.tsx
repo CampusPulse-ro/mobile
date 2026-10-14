@@ -1,8 +1,10 @@
+import { QueryClientProvider } from '@tanstack/react-query'
 import { DarkTheme, Stack, ThemeProvider } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect, useState } from 'react'
 
+import { queryClient } from '@/api/queryClient'
 import { loadSavedLanguage } from '@/i18n'
 import { color } from '@/theme'
 
@@ -38,11 +40,15 @@ export default function RootLayout() {
   if (!ready) return null
 
   return (
-    <ThemeProvider value={theme}>
-      <StatusBar style="light" />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: color.page } }}>
-        <Stack.Screen name="(tabs)" />
-      </Stack>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider value={theme}>
+        <StatusBar style="light" />
+        <Stack
+          screenOptions={{ headerShown: false, contentStyle: { backgroundColor: color.page } }}
+        >
+          <Stack.Screen name="(tabs)" />
+        </Stack>
+      </ThemeProvider>
+    </QueryClientProvider>
   )
 }

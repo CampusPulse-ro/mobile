@@ -5,6 +5,7 @@
   "dependencies": {
     "@expo/ui": "~57.0.21",
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@tanstack/react-query": "5.104.2",
     "expo": "~57.0.26",
     "expo-constants": "~57.0.20",
     "expo-dev-client": "~57.0.19",
@@ -22,6 +23,7 @@
     "expo-system-ui": "~57.0.4",
     "expo-web-browser": "~57.0.3",
     "i18next": "^26.4.4",
+    "openapi-fetch": "0.17.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-i18next": "^17.0.16",
@@ -35,6 +37,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "openapi-typescript": "7.13.0",
     "oxlint": "^1.86.0",
     "prettier": "3.9.10",
     "typescript": "~6.0.3"
@@ -49,7 +52,9 @@
     "typecheck": "tsc --noEmit",
     "doctor": "bunx expo-doctor",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "api:types": "openapi-typescript https://raw.githubusercontent.com/CampusPulse-ro/api/main/openapi/v1.json -o src/api/schema.d.ts",
+    "api:check:prod": "openapi-typescript https://campuspulse-api.thorsp.net/openapi/v1.json -o src/api/schema.d.ts --check"
   },
   "private": true
 }

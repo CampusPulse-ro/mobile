@@ -44,15 +44,16 @@ One issue = one PR = one thing. If it grows past roughly 300 changed lines, spli
 
 ## Where things go
 
-| Path              | What goes there                                                                                              |
-| ----------------- | ------------------------------------------------------------------------------------------------------------ |
-| `src/app/`        | Screens. expo-router turns each file into a route; `(tabs)/` holds the tab screens                           |
-| `src/components/` | Pieces used by more than one screen. `ui.tsx` has the basics (`Screen`, `Title`, `Muted`, `Placeholder`)     |
-| `src/theme.ts`    | Colors, spacing and corner radius. The only place colors are defined                                         |
-| `src/i18n/`       | Every user-facing text, in `en.json` and `ro.json`; dates and times via `useDateTimeFormat()` in `format.ts` |
-| `modules/`        | Native code (Kotlin/Swift). Sebastian's area                                                                 |
+| Path              | What goes there                                                                                                 |
+| ----------------- | --------------------------------------------------------------------------------------------------------------- |
+| `src/app/`        | Screens. expo-router turns each file into a route; `(tabs)/` holds the tab screens                              |
+| `src/components/` | Pieces used by more than one screen. `ui.tsx` has the basics (`Screen`, `Title`, `Muted`, `Placeholder`)        |
+| `src/theme.ts`    | Colors, spacing and corner radius. The only place colors are defined                                            |
+| `src/i18n/`       | Every user-facing text, in `en.json` and `ro.json`; dates and times via `useDateTimeFormat()` in `format.ts`    |
+| `src/api/`        | The API client (`client.ts`), generated types (`schema.d.ts`, never edit by hand) and one hook per kind of data |
+| `modules/`        | Native code (Kotlin/Swift). Sebastian's area                                                                    |
 
-A new top-level folder (for example `src/api/` or `src/hooks/`): ask first, so the structure stays
+A new top-level folder (for example `src/hooks/`): ask first, so the structure stays
 the same for everyone.
 
 ## Code standards
@@ -79,8 +80,8 @@ the same for everyone.
   Windows line endings from before `.gitattributes` existed: run `bun run format` once and commit.
 - **No new package without asking.** When one is agreed, install it with `bunx expo install <name>`,
   not `bun add`: Expo picks the version that matches our SDK.
-- **The backend is reached only through the generated API client** (being set up). Never a URL typed
-  into a screen.
+- **The backend is reached only through the generated API client** (`src/api/`, see below). Never a
+  URL typed into a screen, never `fetch` to our API by hand.
 - **No secrets in the code or the repo:** no passwords, tokens or `.env` files.
 - **Touch targets** are at least 44×44, and an icon-only button has an `accessibilityLabel`.
 
@@ -90,6 +91,49 @@ Dependabot opens grouped weekly PRs, but leaves Expo-managed packages alone: the
 with the Expo SDK (`bunx expo install --fix`). A Dependabot **security** PR on an Expo-managed
 package is the exception it can't skip: close it, and fix it instead by bumping `expo` to the SDK
 patch release that contains the fix, then running `bunx expo install --fix`.
+
+## Calling the API
+
+The API's contract (`openapi/v1.json` in the `api` repo) is turned into TypeScript types, so a typo
+in a path or a wrong field is a type error, not a bug on a phone.
+
+1. **Types:** `bun run api:types` regenerates `src/api/schema.d.ts` from the API's `main`. Run it when
+   the API adds or changes an endpoint, and commit the result. Never edit that file by hand.
+2. **A hook per kind of data** in `src/api/`, using TanStack Query. The existing example is
+   `src/api/health.ts`:
+
+   ```ts
+   export function useApiReadiness() {
+     return useQuery({
+       queryKey: ['health', 'ready'],
+       queryFn: async ({ signal }) => unwrap(await api.GET('/health/ready', { signal })),
+     })
+   }
+   ```
+
+3. **The screen uses the hook** and shows all four states (`src/components/ApiStatus.tsx` is the
+   example):
+   - **loading:** `isPending`;
+   - **error:** `isError` → a message and a way to try again. Show the error screen only when there
+     is no data yet (`isError && !data`); if old data is on screen, keep it and add a small "couldn't
+     refresh" note;
+   - **empty:** an empty list → the empty state ("no classes today"). The health example has none;
+   - **data.**
+
+`unwrap` turns any non-2xx response into an `ApiError` (with its `status`), so "the server answered
+with an error" and "never reached the server" (no connection, a timeout after 15 s) can show
+different messages. Which API a build talks to is in `src/config.ts`. Data refreshes when the app
+comes back to the foreground.
+
+**When the API changes:**
+
+- A new endpoint reaches **stage** when its API PR merges, and **prod** only at the API's next
+  release. Regenerate with `bun run api:types` (it reads the API's `main`), and wait about 5 minutes
+  after an API merge first: GitHub caches the raw file.
+- Before a production build, `bun run api:check:prod` checks the committed types against the
+  contract prod actually serves (see the README's Releasing section).
+- `openapi-typescript` warns that it wants TypeScript 5; that warning is harmless. Don't downgrade
+  TypeScript.
 
 ## Before you open a PR
 
