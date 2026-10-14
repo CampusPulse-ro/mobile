@@ -41,7 +41,11 @@
       "reactCompiler": true
     },
     "extra": {
-      "router": {}
-    }
+      "router": {},
+      "eas": {
+        "projectId": "f09d721b-fe8d-48ed-aa43-a412d10561ba"
+      }
+    },
+    "owner": "thorsp"
   }
 }

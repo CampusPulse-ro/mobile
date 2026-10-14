@@ -6,7 +6,10 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_BASE": "https://campuspulse-api-stage.thorsp.net"
+      }
     },
     "development-simulator": {
       "extends": "development",
@@ -15,11 +18,17 @@
       }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_BASE": "https://campuspulse-api-stage.thorsp.net"
+      }
     },
     "production": {
       "distribution": "store",
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_API_BASE": "https://campuspulse-api.thorsp.net"
+      }
     }
   },
   "submit": {
