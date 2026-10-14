@@ -1,0 +1,12 @@
+# Groups the auto-generated release notes (`gh release create vX.Y.Z --generate-notes`).
+changelog:
+  categories:
+    - title: Features
+      labels: [enhancement, feat]
+    - title: Fixes
+      labels: [bug]
+    - title: Dependencies
+      labels: [dependencies]
+      authors: ['dependabot[bot]']
+    - title: Other changes
+      labels: ['*']
