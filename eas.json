@@ -6,10 +6,7 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal",
-      "env": {
-        "EXPO_PUBLIC_API_BASE": "https://campuspulse-api-stage.thorsp.net"
-      }
+      "distribution": "internal"
     },
     "development-simulator": {
       "extends": "development",
