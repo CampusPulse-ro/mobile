@@ -29,7 +29,8 @@ Bun · oxlint.
   published, so change it before the first store build if the domain changes.
 - URL scheme `campuspulse`: the Campus Virtual sign-in hands the app its token at
   `campuspulse://token=…`.
-- No EAS project yet: `eas init` adds `owner` and `extra.eas.projectId` to `app.json`.
+- EAS project [`@thorsp/campuspulse`](https://expo.dev/accounts/thorsp/projects/campuspulse) (`owner` and
+  `extra.eas.projectId` in `app.json`). Android signing credentials live on Expo's servers.
 
 ## Prerequisites
 
@@ -51,9 +52,37 @@ Expo Go works while there are no custom native modules.
 A dev build made before i18n (#11) lacks AsyncStorage, which the saved language uses: build a
 fresh dev client after pulling. Expo Go already has it.
 
-Dev build: `eas build --profile development --platform android|ios`
-(`development-simulator` for the iOS simulator), or locally with `bun run android`
-(Android SDK) / `bun run ios` (Mac + Xcode).
+### Development build
+
+A development build is the app with our native code and the dev menu, installed on the phone like a
+normal app; it loads the JavaScript from `bun start`.
+
+- **Install it:** open the build page on the phone and tap **Install** (or scan its QR code):
+  https://expo.dev/accounts/thorsp/projects/campuspulse/builds/004b63f0-292f-4d5f-8ce6-3b0b3de90674.
+  Internal-distribution build pages open for anyone with the link.
+- **First install gotchas:**
+  - Android asks once to allow installing from the browser.
+  - Play Protect may warn about an unknown app: **More details → Install anyway**.
+  - A build you made locally with `bun run android` (debug-signed) won't install over the EAS
+    build, or the other way round: uninstall the old one first.
+  - If the phone can't reach your laptop (campus Wi-Fi often blocks it), use `bun start --tunnel`.
+- **Make a new one** (after a native change, e.g. a new native package): `eas build -p android
+--profile development` (`development-simulator` for the iOS simulator). The EAS project is on
+  Sebastian's Expo account, so for now he runs it. Or build locally with `bun run android` (Android
+  SDK) / `bun run ios` (Mac + Xcode).
+
+### Which build talks to which API
+
+| Build                        | API                                                                                                    |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Development build or Expo Go | what `bun start` sees: `EXPO_PUBLIC_API_BASE` from the shell or a `.env.local` file; unset means stage |
+| EAS `preview`                | stage, `https://campuspulse-api-stage.thorsp.net`                                                      |
+| EAS `production`             | prod, `https://campuspulse-api.thorsp.net`                                                             |
+
+To point your local app at another API, put `EXPO_PUBLIC_API_BASE=<url>` in `.env.local` (ignored by
+git) and restart `bun start`. A release bundle built outside `eas.json` with no variable set fails at
+startup instead of quietly using stage. The URL is read only in `src/config.ts`; never write an API
+URL anywhere else.
 
 ## Checks
 
