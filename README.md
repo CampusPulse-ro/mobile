@@ -112,6 +112,46 @@ Before a production build, run `bun run api:check:prod`: it checks that the comm
 the contract the **prod** API serves. If it fails, the app uses an endpoint prod doesn't have yet:
 release the API first.
 
+## Campus Virtual
+
+Profile can connect the student's own Campus Virtual (cv.upt.ro) account. Code: `src/campusVirtual/`.
+
+- **How it signs in:** the app opens Campus Virtual's mobile sign-in page (`launch.php`, the same
+  flow the official Moodle app uses) in a browser tab. The student signs in with their UPT
+  Microsoft account there, so the app never sees the password. Campus Virtual sends the app a web
+  service token at `campuspulse://token=…`. The app keeps it only if it belongs to the attempt it
+  started: `siteid` = md5(site URL + passport), with the passport from the platform's secure random
+  generator.
+- **That URL is a credential:** `src/app/+native-intent.tsx` keeps expo-router from routing to it
+  (a cold start with it opens Profile), and the not-found screen never prints a link.
+- **What's stored:** only that token, in the phone's secure storage (`expo-secure-store`, key
+  `campusVirtual.token`, this device only, never in a backup). It never goes to our API and is
+  never logged. A reinstall starts disconnected. Disconnect forgets it on the phone; it stays valid
+  on UPT's side until it expires (neither the app nor the student can revoke it).
+- **Read-only:** the token is full access to the student's account (it could submit quizzes), so
+  `src/campusVirtual/client.ts` calls only the functions on its allow-list
+  (`core_webservice_get_site_info` for now). Add a function there only if it only reads, and never
+  `tool_mobile_call_external_functions` (it calls other functions, bypassing the list),
+  `tool_mobile_get_autologin_key` (it turns the token into a browser session) or any `*_view_*`
+  function (they record views and activity completion).
+- **Lifetime:** it is the same token the official Moodle app holds for the student (Moodle keeps
+  one per user), so it expires when that one does: UPT's token duration (Moodle's default is 12
+  weeks) from whichever app connected first, possibly sooner than 12 weeks after connecting here.
+  It can't be refreshed: when Campus Virtual answers `invalidtoken` or `accessexception`, the app
+  forgets it and shows **Reconnect**.
+- **Known limit (Android):** any app can register `campuspulse://`. Moodle's flow has no PKCE and
+  doesn't allow https App Links for it, so the siteid check ties the redirect to this attempt but
+  can't stop another installed app from also receiving it. That is the same exposure as the
+  official Moodle app's `moodlemobile://`. iOS isn't affected: the auth session hands the redirect
+  only to the app that opened it.
+- **Known limit (Android): the system log.** Android itself logs the redirect intent, URL
+  included (`ActivityTaskManager: START … dat=campuspulse://token=…`), so the token is in the
+  device log. Other apps can't read it, but adb, the shell user and bug reports can. The app
+  logs nothing of it; the official Moodle app has the same exposure. Seen on a real device,
+  2026-10-18.
+- **Which build:** the `campuspulse://` redirect needs a build that has that scheme, so test it on
+  the **dev build**, not Expo Go.
+
 ## Checks
 
 `bun run format` (`format:check` in CI) · `bun run lint` · `bun run typecheck` · `bun run doctor`.

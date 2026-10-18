@@ -22,6 +22,22 @@
     "about": "Your account and connected services.",
     "language": "Language"
   },
+  "campusVirtual": {
+    "title": "Campus Virtual",
+    "about": "Connect your UPT Campus Virtual account to see your courses and deadlines here. You sign in on UPT's own page (choose “Log in with UPT” there), so the app never sees your password.",
+    "loading": "Checking your Campus Virtual connection…",
+    "connect": "Connect Campus Virtual",
+    "connecting": "Waiting for Campus Virtual…",
+    "connected": "Connected",
+    "connectedAs": "Connected as {{name}}",
+    "disconnect": "Disconnect",
+    "expired": "Your Campus Virtual connection has expired. Connect again to keep your data up to date.",
+    "reconnect": "Reconnect",
+    "errorUnreachable": "Couldn't reach Campus Virtual. Check your internet connection and try again.",
+    "errorRefused": "The sign-in couldn't be verified, so nothing was saved. Try again.",
+    "errorRejected": "Campus Virtual turned the request down ({{code}}). Try again later, or disconnect and connect again.",
+    "retry": "Try again"
+  },
   "language": {
     "en": "English",
     "ro": "Română"
@@ -33,5 +49,10 @@
     "serverError": "The server ran into a problem",
     "unreachable": "Can't reach the server",
     "retry": "Try again"
+  },
+  "notFound": {
+    "title": "Nothing here",
+    "about": "This link doesn't open anything in CampusPulse.",
+    "home": "Go to Today"
   }
 }

@@ -22,6 +22,22 @@
     "about": "Contul tău și serviciile conectate.",
     "language": "Limbă"
   },
+  "campusVirtual": {
+    "title": "Campus Virtual",
+    "about": "Conectează-ți contul Campus Virtual UPT ca să-ți vezi aici cursurile și termenele limită. Te autentifici pe pagina UPT (alege acolo „Log in with UPT”), așa că aplicația nu îți vede niciodată parola.",
+    "loading": "Se verifică conexiunea cu Campus Virtual…",
+    "connect": "Conectează Campus Virtual",
+    "connecting": "Se așteaptă Campus Virtual…",
+    "connected": "Cont conectat",
+    "connectedAs": "Cont conectat: {{name}}",
+    "disconnect": "Deconectează",
+    "expired": "Conexiunea cu Campus Virtual a expirat. Conectează-te din nou ca datele să rămână la zi.",
+    "reconnect": "Reconectează",
+    "errorUnreachable": "Campus Virtual nu răspunde. Verifică conexiunea la internet și încearcă din nou.",
+    "errorRefused": "Autentificarea nu a putut fi verificată, așa că nu s-a salvat nimic. Încearcă din nou.",
+    "errorRejected": "Campus Virtual a refuzat cererea ({{code}}). Încearcă mai târziu sau deconectează-te și conectează-te din nou.",
+    "retry": "Încearcă din nou"
+  },
   "language": {
     "en": "English",
     "ro": "Română"
@@ -33,5 +49,10 @@
     "serverError": "Serverul a întâmpinat o problemă",
     "unreachable": "Serverul nu poate fi contactat",
     "retry": "Încearcă din nou"
+  },
+  "notFound": {
+    "title": "Nu e nimic aici",
+    "about": "Linkul acesta nu deschide nimic în CampusPulse.",
+    "home": "Mergi la Azi"
   }
 }
