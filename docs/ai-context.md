@@ -20,21 +20,25 @@ plain words. Keep each change small enough to read and test in a few minutes.
 
 ## Structure
 
-| Path                    | What                                                                                                  |
-| ----------------------- | ----------------------------------------------------------------------------------------------------- |
-| `src/app/`              | Screens. Each file is a route (expo-router). `(tabs)/` = Today, Timetable, Map, Profile               |
-| `src/app/_layout.tsx`   | Root layout: navigation theme and stack                                                               |
-| `src/components/ui.tsx` | Shared building blocks: `Screen`, `Title`, `Muted`, `Placeholder`                                     |
-| `src/theme.ts`          | Design tokens: `color`, `space`, `radius`. The only place colors are defined                          |
-| `src/i18n/`             | Translations: `en.json`, `ro.json` (same keys), `index.ts` (setup), `format.ts` (`useDateTimeFormat`) |
-| `modules/`              | Native Kotlin/Swift modules                                                                           |
-| `app.json`, `eas.json`  | App identity and build profiles                                                                       |
+| Path                    | What                                                                                                                                                              |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/app/`              | Screens. Each file is a route (expo-router). `(tabs)/` = Today, Timetable, Map, Profile                                                                           |
+| `src/app/_layout.tsx`   | Root layout: navigation theme and stack                                                                                                                           |
+| `src/components/ui.tsx` | Shared building blocks: `Screen`, `Title`, `Muted`, `Placeholder`                                                                                                 |
+| `src/theme.ts`          | Design tokens: `color`, `space`, `radius`, generated from the web repo's `design/tokens.json` (`bun run design:tokens`; never edit)                               |
+| `src/design/`           | `tokens.json` (copy of web's) and the generated `tokens.ts`. Never edit                                                                                           |
+| `src/i18n/`             | Translations: `en.json`, `ro.json` (same keys), `index.ts` (setup), `format.ts` (`useDateTimeFormat`)                                                             |
+| `src/api/`              | API client (`client.ts`, `unwrap`, `ApiError`), generated types `schema.d.ts` (never edit), one TanStack Query hook per kind of data (`health.ts` is the example) |
+| `modules/`              | Native Kotlin/Swift modules                                                                                                                                       |
+| `app.json`, `eas.json`  | App identity and build profiles                                                                                                                                   |
 
 ## Rules for your answers
 
 1. **Follow the existing patterns.** Before writing a new screen or component, look at (or ask for)
    the closest existing one and match it.
 2. **Style only with the tokens from `src/theme.ts`.** No hex colors or magic numbers in screens.
+   They're generated (never edit `src/theme.ts` or `src/design/`); component names and variants come
+   from `docs/design-system.md`.
 3. **Screens that load data handle four states:** loading, error with retry, empty, and data.
 4. **No user-facing text written directly in components,** and that includes props such as
    `accessibilityLabel` and `placeholder` (oxlint's `react/jsx-no-literals` only catches text
@@ -47,7 +51,11 @@ plain words. Keep each change small enough to read and test in a few minutes.
 5. **No new packages unless I ask.** If one is truly needed, say so and why, and use
    `bunx expo install <name>` so the version matches Expo SDK 57.
 6. **The backend is called only through the generated API client.** Never `fetch` with a URL written
-   by hand. If the client or the endpoint you need doesn't exist yet, say so; do not invent one.
+   by hand. Pattern: a hook in `src/api/` with `useQuery` and
+   `queryFn: async ({ signal }) => unwrap(await api.GET('/path', { signal }))` (see `src/api/health.ts`),
+   used by the screen with its loading/error/data states (see `src/components/ApiStatus.tsx`). Paths
+   and types come from `src/api/schema.d.ts`; if the endpoint you need isn't in it, say so; do not
+   invent one, and don't edit that file (it's regenerated with `bun run api:types`).
 7. **Don't invent APIs.** If you are not sure a prop, function or library exists in Expo SDK 57 /
    React Native 0.86, say that you are not sure.
 8. **Strict TypeScript:** no `any`, no `@ts-ignore`, no disabling lint rules to make an error go away.

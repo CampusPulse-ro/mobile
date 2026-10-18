@@ -4,5 +4,6 @@
   "rules": {
     "react/rules-of-hooks": "error",
     "react/jsx-no-literals": "error"
-  }
+  },
+  "ignorePatterns": ["src/api/schema.d.ts"]
 }

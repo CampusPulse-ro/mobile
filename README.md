@@ -11,14 +11,14 @@ Bun · oxlint.
 
 ## Layout
 
-| Path                    | What                                                                                                                                       |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `src/app/`              | Routes. `_layout` sets the navigation theme; `(tabs)/` = Today, Timetable, Map, Profile (placeholders)                                     |
-| `src/components/ui.tsx` | Shared building blocks (`Screen`, `Title`, `Muted`, `Placeholder`)                                                                         |
-| `src/theme.ts`          | Design tokens (colors, spacing, radius), the same names and values as the web app                                                          |
-| `src/i18n/`             | Translations: English (default) and Romanian in `en.json` / `ro.json`, setup in `index.ts`, dates via `useDateTimeFormat()` in `format.ts` |
-| `modules/`              | Custom native modules (Swift/Kotlin); see its README                                                                                       |
-| `assets/images/`        | Placeholder icon and splash ("CP" lettermark)                                                                                              |
+| Path                    | What                                                                                                                                                                    |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/app/`              | Routes. `_layout` sets the navigation theme; `(tabs)/` = Today, Timetable, Map, Profile (placeholders)                                                                  |
+| `src/components/ui.tsx` | Shared building blocks (`Screen`, `Title`, `Muted`, `Placeholder`)                                                                                                      |
+| `src/theme.ts`          | Design tokens (colors, spacing, radius), generated from the web repo's `design/tokens.json` by `bun run design:tokens` ([docs/design-system.md](docs/design-system.md)) |
+| `src/i18n/`             | Translations: English (default) and Romanian in `en.json` / `ro.json`, setup in `index.ts`, dates via `useDateTimeFormat()` in `format.ts`                              |
+| `modules/`              | Custom native modules (Swift/Kotlin); see its README                                                                                                                    |
+| `assets/images/`        | Placeholder icon and splash ("CP" lettermark)                                                                                                                           |
 
 `ios/` and `android/` are **not committed**: `expo prebuild` generates them from
 `app.json` + config plugins (Continuous Native Generation), and EAS does that on every build.
@@ -84,6 +84,18 @@ git) and restart `bun start`. A release bundle built outside `eas.json` with no 
 startup instead of quietly using stage. The URL is read only in `src/config.ts`; never write an API
 URL anywhere else.
 
+## API
+
+The app talks to the CampusPulse API through a typed client generated from the API's committed
+OpenAPI contract:
+
+```bash
+bun run api:types    # regenerate src/api/schema.d.ts from the api repo's main, then commit it
+```
+
+Which API a build uses: `src/config.ts` (stage for development and preview, prod for production).
+How screens call it: CONTRIBUTING, "Calling the API".
+
 ## Releasing
 
 - Tags are `vX.Y.Z` (semver). Only admins can create `v*` tags (a tag ruleset).
@@ -95,6 +107,10 @@ URL anywhere else.
   come with the Google Play decision.
 - Cut one with `gh release create vX.Y.Z --generate-notes`; the notes are grouped by label
   (`.github/release.yml`): features, fixes, dependencies, other.
+
+Before a production build, run `bun run api:check:prod`: it checks that the committed API types match
+the contract the **prod** API serves. If it fails, the app uses an endpoint prod doesn't have yet:
+release the API first.
 
 ## Campus Virtual
 

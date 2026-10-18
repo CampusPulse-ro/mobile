@@ -13,6 +13,8 @@ An AI only knows what it can see. How you show it the project depends on the too
 - **An AI inside your editor that can open files itself** (VS Code with Copilot, Cursor…): most of
   them read `AGENTS.md` automatically. If yours doesn't, start with "Read `docs/ai-context.md` and
   `CONTRIBUTING.md` first."
+- **Anything visual** (a screen, a component, a color): also give it [`design-system.md`](design-system.md),
+  so it uses our tokens and component names instead of inventing new ones.
 
 ## 2. The loop for every change
 
