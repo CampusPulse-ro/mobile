@@ -6,8 +6,10 @@ This page is only what's different here.
 
 ## Tokens in this app
 
-- **Use them through `@/theme`:** `color.page`, `color.inkMuted`, `space.md`, `radius.pill`. Never a
-  hex color or a magic number in a screen.
+- **Use them through `@/theme`:** `color.page`, `color.inkMuted`, `space.md`, `radius.pill`, and the
+  type scale `type.title` … `type.caption` as text styles (`style={[type.bodySmall, { color:
+color.inkMuted }]}`; no font family, the platform font stays). Text on an accent or danger fill is
+  `color.onAccent`. Never a hex color or a magic number in a screen.
 - They're generated, never written by hand:
   - `src/design/tokens.json` is a byte-for-byte copy of web's `design/tokens.json`, the one source;
   - `src/design/tokens.ts` is generated from it, and `src/theme.ts` re-exports it.

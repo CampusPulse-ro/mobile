@@ -9,9 +9,12 @@ export const color = {
   inkSoft: '#c2c8cf',
   inkMuted: '#9aa3ad',
   line: '#262a31',
-  lineStrong: '#3a404a',
+  lineStrong: '#5d6777',
   accent: '#4f8cff',
   warn: '#f2b84b',
+  danger: '#f87171',
+  success: '#3ecf8e',
+  onAccent: '#0f1115',
 } as const
 
 export const space = {
@@ -28,4 +31,15 @@ export const radius = {
   md: 12,
   lg: 16,
   pill: 999,
+} as const
+
+export const type = {
+  display: { fontSize: 34, lineHeight: 40, fontWeight: '700', letterSpacing: -0.5 },
+  title: { fontSize: 28, lineHeight: 34, fontWeight: '700', letterSpacing: -0.3 },
+  heading: { fontSize: 20, lineHeight: 28, fontWeight: '600', letterSpacing: -0.1 },
+  subtitle: { fontSize: 16, lineHeight: 24, fontWeight: '600', letterSpacing: 0 },
+  body: { fontSize: 16, lineHeight: 24, fontWeight: '400', letterSpacing: 0 },
+  bodySmall: { fontSize: 14, lineHeight: 20, fontWeight: '400', letterSpacing: 0 },
+  label: { fontSize: 14, lineHeight: 20, fontWeight: '600', letterSpacing: 0 },
+  caption: { fontSize: 12, lineHeight: 16, fontWeight: '500', letterSpacing: 0 },
 } as const
