@@ -22,6 +22,9 @@ This page is only what's different here.
 
 ## Components
 
-Same names, variants and props as in Figma and on web (the inventory in web's doc). A component used by
-more than one screen lives in `src/components/`; today `ui.tsx` has `Screen`, `Title`, `Muted` and
+The design is in Penpot: [CampusPulse Design System](https://design.penpot.app/#/workspace?team-id=cd444aaf-0d8c-801b-8008-cea5af48ec20&file-id=ce180602-f36b-8035-8008-cea5c29ed940)
+(team CampusPulse; Sebastian invites). Its Components page draws every component at mobile size
+(390 wide) first. Same names, variants and props as in Penpot and on web: a Penpot variant property
+is the prop, with the same name and values (the inventory in web's doc). A component used by more
+than one screen lives in `src/components/`; today `ui.tsx` has `Screen`, `Title`, `Muted` and
 `Placeholder` (the future `EmptyState`).
