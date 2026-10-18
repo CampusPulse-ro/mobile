@@ -24,7 +24,7 @@
   },
   "campusVirtual": {
     "title": "Campus Virtual",
-    "about": "Connect your UPT Campus Virtual account to see your courses and deadlines here. You sign in on UPT's own page, so the app never sees your password.",
+    "about": "Connect your UPT Campus Virtual account to see your courses and deadlines here. You sign in on UPT's own page (choose “Log in with UPT” there), so the app never sees your password.",
     "loading": "Checking your Campus Virtual connection…",
     "connect": "Connect Campus Virtual",
     "connecting": "Waiting for Campus Virtual…",

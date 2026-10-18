@@ -24,7 +24,7 @@
   },
   "campusVirtual": {
     "title": "Campus Virtual",
-    "about": "Conectează-ți contul Campus Virtual UPT ca să-ți vezi aici cursurile și termenele limită. Te autentifici pe pagina UPT, așa că aplicația nu îți vede niciodată parola.",
+    "about": "Conectează-ți contul Campus Virtual UPT ca să-ți vezi aici cursurile și termenele limită. Te autentifici pe pagina UPT (alege acolo „Log in with UPT”), așa că aplicația nu îți vede niciodată parola.",
     "loading": "Se verifică conexiunea cu Campus Virtual…",
     "connect": "Conectează Campus Virtual",
     "connecting": "Se așteaptă Campus Virtual…",

@@ -144,6 +144,11 @@ Profile can connect the student's own Campus Virtual (cv.upt.ro) account. Code: 
   can't stop another installed app from also receiving it. That is the same exposure as the
   official Moodle app's `moodlemobile://`. iOS isn't affected: the auth session hands the redirect
   only to the app that opened it.
+- **Known limit (Android): the system log.** Android itself logs the redirect intent, URL
+  included (`ActivityTaskManager: START … dat=campuspulse://token=…`), so the token is in the
+  device log. Other apps can't read it, but adb, the shell user and bug reports can. The app
+  logs nothing of it; the official Moodle app has the same exposure. Seen on a real device,
+  2026-10-18.
 - **Which build:** the `campuspulse://` redirect needs a build that has that scheme, so test it on
   the **dev build**, not Expo Go.
 
