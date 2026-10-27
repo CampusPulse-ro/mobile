@@ -2,7 +2,7 @@
   "tabs": {
     "today": "Today",
     "timetable": "Timetable",
-    "map": "Map",
+    "map": "Rooms",
     "profile": "Profile"
   },
   "today": {
@@ -55,9 +55,40 @@
       "week": "Week"
     }
   },
-  "map": {
-    "title": "Map",
-    "about": "Campus buildings and rooms."
+  "rooms": {
+    "title": "Rooms",
+    "search": "Search by room or building",
+    "searchLabel": "Search rooms",
+    "clearSearch": "Clear the search",
+    "freeNowFilter": "Only rooms free now",
+    "capped": "Checks only the first rooms in the list (at most {{n}}). Search to narrow it down.",
+    "checking": "Checking which rooms are free…",
+    "checkFailed": "Couldn't check some rooms ({{n}})",
+    "noRooms": "No rooms yet",
+    "noRoomsAbout": "This semester's timetable hasn't been loaded yet. Check back later.",
+    "noMatch": "No room matches “{{query}}”",
+    "noFreeRooms": "None of these rooms is free right now",
+    "noBuilding": "Other rooms",
+    "floor": "floor {{floor}}",
+    "capacity": "{{n}} seats",
+    "openDay": "Shows what's on in this room today",
+    "freeNow": "Free now",
+    "freeUntil": "Free until {{time}}",
+    "inUseUntil": "In use until {{time}}",
+    "nowOn": "Now: {{subject}}",
+    "next": "Next: {{time}} {{subject}}",
+    "nothingElseToday": "Nothing else scheduled today",
+    "day": {
+      "back": "Back",
+      "previousDay": "Previous day",
+      "nextDay": "Next day",
+      "backToToday": "Back to today",
+      "empty": "Nothing scheduled in this room today",
+      "emptyOn": "Nothing scheduled in this room that day",
+      "notFound": "No such room",
+      "offered": "Offered slot",
+      "offeredAbout": "For the students who pick this slot"
+    }
   },
   "profile": {
     "title": "Profile",

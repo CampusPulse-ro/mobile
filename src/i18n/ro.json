@@ -2,7 +2,7 @@
   "tabs": {
     "today": "Azi",
     "timetable": "Orar",
-    "map": "Hartă",
+    "map": "Săli",
     "profile": "Profil"
   },
   "today": {
@@ -55,9 +55,40 @@
       "week": "Săptămână"
     }
   },
-  "map": {
-    "title": "Hartă",
-    "about": "Clădirile și sălile din campus."
+  "rooms": {
+    "title": "Săli",
+    "search": "Caută după sală sau clădire",
+    "searchLabel": "Caută săli",
+    "clearSearch": "Șterge căutarea",
+    "freeNowFilter": "Doar sălile libere acum",
+    "capped": "Se verifică doar primele săli din listă (cel mult {{n}}). Caută ca să restrângi lista.",
+    "checking": "Se verifică ce săli sunt libere…",
+    "checkFailed": "Unele săli nu au putut fi verificate ({{n}})",
+    "noRooms": "Nicio sală încă",
+    "noRoomsAbout": "Orarul semestrului nu a fost încă încărcat. Revino mai târziu.",
+    "noMatch": "Nicio sală nu se potrivește cu „{{query}}”",
+    "noFreeRooms": "Niciuna dintre aceste săli nu e liberă acum",
+    "noBuilding": "Alte săli",
+    "floor": "etajul {{floor}}",
+    "capacity": "capacitate {{n}}",
+    "openDay": "Arată ce se ține azi în sală",
+    "freeNow": "Liberă acum",
+    "freeUntil": "Liberă până la {{time}}",
+    "inUseUntil": "Ocupată până la {{time}}",
+    "nowOn": "Acum: {{subject}}",
+    "next": "Urmează: {{time}} {{subject}}",
+    "nothingElseToday": "Nimic altceva programat azi",
+    "day": {
+      "back": "Înapoi",
+      "previousDay": "Ziua anterioară",
+      "nextDay": "Ziua următoare",
+      "backToToday": "Înapoi la azi",
+      "empty": "Nimic programat azi în această sală",
+      "emptyOn": "Nimic programat în această sală în acea zi",
+      "notFound": "Sala nu există",
+      "offered": "Interval oferit",
+      "offeredAbout": "Pentru studenții care aleg acest interval"
+    }
   },
   "profile": {
     "title": "Profil",
