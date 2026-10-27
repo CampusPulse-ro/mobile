@@ -1,6 +1,6 @@
 import { useQueryClient, type UseQueryResult } from '@tanstack/react-query'
 import { useRouter } from 'expo-router'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   ActivityIndicator,
@@ -17,6 +17,7 @@ import {
   CampusVirtualExpiredError,
   checkFiles,
   checkText,
+  hasEmbeddedFiles,
   countWords,
   type AssignmentRules,
   type SubmissionFile,
@@ -221,6 +222,8 @@ function Actions({
   const [statementAccepted, setStatementAccepted] = useState(false)
   const [checking, setChecking] = useState<'save' | 'grade' | null>(null)
   const [pickerNote, setPickerNote] = useState<string | null>(null)
+  // Set from the first tap until its confirmation is shown: a second tap in between does nothing.
+  const confirming = useRef(false)
 
   const can = allowedActions(rules, state, now)
   const busy = checking !== null || save.isPending || grade.isPending
@@ -237,13 +240,16 @@ function Actions({
   const formatted = rules.onlineText !== null && hasFormatting(state.textHtml)
   // Without drafts, saving IS submitting: the statement is accepted before it, as on the website.
   const saveNeedsStatement = !rules.drafts && rules.statement !== null
-  const saveBlock = !changed
-    ? t('assignments.edit.noChanges')
-    : (input.text !== undefined && overLimit) || fileProblems.length > 0
-      ? t('assignments.edit.fixProblems')
-      : saveNeedsStatement && !statementAccepted
-        ? t('assignments.edit.acceptStatement')
-        : null
+  const embedded = rules.onlineText !== null && hasEmbeddedFiles(state.textHtml)
+  const saveBlock = embedded
+    ? t('assignments.edit.embeddedFiles')
+    : !changed
+      ? t('assignments.edit.noChanges')
+      : (input.text !== undefined && overLimit) || fileProblems.length > 0
+        ? t('assignments.edit.fixProblems')
+        : saveNeedsStatement && !statementAccepted
+          ? t('assignments.edit.acceptStatement')
+          : null
   const saveLabel = rules.drafts
     ? t('assignments.edit.saveDraft')
     : t('assignments.edit.saveAndSubmit')
@@ -265,7 +271,16 @@ function Actions({
   }
 
   const confirmSave = async () => {
-    if (busy || saveBlock !== null) return
+    if (busy || saveBlock !== null || confirming.current) return
+    confirming.current = true
+    try {
+      await prepareSave()
+    } finally {
+      confirming.current = false
+    }
+  }
+
+  const prepareSave = async () => {
     const fresh = await readAgain('save')
     if (!fresh) return
     if (!allowedNow(rules, fresh).edit) {
@@ -313,7 +328,7 @@ function Actions({
 
   const write = (sent: SaveInput) => {
     save.mutate(
-      { rules, input: sent },
+      { rules, input: { ...sent, acceptStatement: statementAccepted } },
       {
         onSuccess: (after) => {
           setDraftText(null)
@@ -338,7 +353,17 @@ function Actions({
   }
 
   const confirmGrading = async () => {
-    if (busy || changed || (rules.statement !== null && !statementAccepted)) return
+    if (busy || changed || (rules.statement !== null && !statementAccepted) || confirming.current)
+      return
+    confirming.current = true
+    try {
+      await prepareGrading()
+    } finally {
+      confirming.current = false
+    }
+  }
+
+  const prepareGrading = async () => {
     const fresh = await readAgain('grade')
     if (!fresh) return
     if (!allowedNow(rules, fresh).submitForGrading) {
@@ -483,9 +508,9 @@ function Actions({
             </View>
           ) : null}
 
-          {saveNeedsStatement && rules.statement ? (
+          {saveNeedsStatement ? (
             <StatementSwitch
-              statement={rules.statement}
+              statement={rules.statement || t('assignments.statementFallback')}
               value={statementAccepted}
               onChange={setStatementAccepted}
               disabled={busy}
@@ -498,7 +523,9 @@ function Actions({
             disabled={busy || saveBlock !== null}
             onPress={() => void confirmSave()}
           />
-          {saveBlock !== null && changed ? <Text style={styles.caption}>{saveBlock}</Text> : null}
+          {saveBlock !== null && (changed || embedded) ? (
+            <Text style={styles.caption}>{saveBlock}</Text>
+          ) : null}
         </View>
       ) : (
         <Text style={styles.reason}>
@@ -512,9 +539,9 @@ function Actions({
             {t('assignments.grading.heading')}
           </Text>
           <Text style={styles.muted}>{t('assignments.grading.about')}</Text>
-          {rules.statement ? (
+          {rules.statement !== null ? (
             <StatementSwitch
-              statement={rules.statement}
+              statement={rules.statement || t('assignments.statementFallback')}
               value={statementAccepted}
               onChange={setStatementAccepted}
               disabled={busy}

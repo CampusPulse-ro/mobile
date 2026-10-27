@@ -169,7 +169,8 @@ function AssignmentRow({
     rules.opensAt !== null && rules.opensAt > now
       ? t('assignments.row.opens', { when: text.whenShort(rules.opensAt, now) })
       : null,
-    rules.cutoffAt !== null && rules.cutoffAt < now ? t('assignments.row.closed') : null,
+    // "Cut-off passed", not "Closed": an extension (unknown here) can keep it open.
+    rules.cutoffAt !== null && rules.cutoffAt < now ? t('assignments.row.cutoffPassed') : null,
     status,
   ]
     .filter(Boolean)

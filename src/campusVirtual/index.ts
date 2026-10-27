@@ -23,6 +23,7 @@ import {
   allowedActions,
   checkFiles,
   checkText,
+  hasEmbeddedFiles,
   parseAssignment,
   parseSubmissionStatus,
   saveSubmissionParams,
@@ -34,6 +35,7 @@ import {
 import {
   callReadOnly,
   callWrite,
+  CampusVirtualError,
   CampusVirtualExpiredError,
   CampusVirtualInputError,
   CampusVirtualNotAllowedError,
@@ -53,6 +55,7 @@ export {
   checkFiles,
   checkText,
   countWords,
+  hasEmbeddedFiles,
   moodleText,
   type AssignmentRules,
   type FileProblem,
@@ -296,7 +299,8 @@ async function draftItemId(token: string): Promise<number> {
     'core_files_get_unused_draft_itemid',
     token,
   )
-  if (typeof answer.itemid !== 'number') throw new CampusVirtualExpiredError()
+  // An unexpected answer, not an expired token: never disconnect over it.
+  if (typeof answer.itemid !== 'number') throw new CampusVirtualError('rejected', 'no_draft_itemid')
   return answer.itemid
 }
 
@@ -316,11 +320,19 @@ export type SubmissionFile = PickedFile & { uri: string; mimeType: string }
  */
 export async function saveSubmission(
   rules: AssignmentRules,
-  input: { text?: string; files?: SubmissionFile[] },
+  input: { text?: string; files?: SubmissionFile[]; acceptStatement?: boolean },
 ): Promise<SubmissionState> {
   return connected(async (token) => {
     const before = await readSubmission(token, rules.id)
     if (!allowedActions(rules, before, Date.now()).edit) throw new CampusVirtualNotAllowedError()
+    // Images embedded in the text would be lost by any save from here (see hasEmbeddedFiles).
+    if (rules.onlineText && hasEmbeddedFiles(before.textHtml)) {
+      throw new CampusVirtualInputError([{ kind: 'embeddedFiles' }])
+    }
+    // Without drafts a save submits, and Moodle's web service doesn't ask for the statement.
+    if (!rules.drafts && rules.statement !== null && input.acceptStatement !== true) {
+      throw new CampusVirtualInputError([{ kind: 'statement' }])
+    }
     const problems = [
       ...(input.text !== undefined ? [checkText(input.text, rules)].filter((p) => p !== null) : []),
       ...(input.files !== undefined ? checkFiles(input.files, rules) : []),

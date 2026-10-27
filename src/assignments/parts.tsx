@@ -1,9 +1,9 @@
 import { useRouter, type Href } from 'expo-router'
-import * as WebBrowser from 'expo-web-browser'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, Linking, Pressable, StyleSheet, Switch, Text, View } from 'react-native'
+import { ActivityIndicator, Pressable, StyleSheet, Switch, Text, View } from 'react-native'
 
 import { SITE_URL } from '@/campusVirtual/redirect'
+import { openLink } from '@/components/openLink'
 import { color, radius, space, type } from '@/theme'
 
 import type { Outcome } from './text'
@@ -11,7 +11,7 @@ import type { Outcome } from './text'
 /** The assignment's own page on Campus Virtual, in the in-app browser. */
 export function openInCampusVirtual(cmid: number) {
   const link = `${SITE_URL}/mod/assign/view.php?id=${cmid}`
-  void WebBrowser.openBrowserAsync(link).catch(() => Linking.openURL(link))
+  openLink(link)
 }
 
 /** Back, then the screen's title (and a second line). `fallback` when there's nothing to go back to. */

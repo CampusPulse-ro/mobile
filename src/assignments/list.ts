@@ -3,7 +3,9 @@ import type { AssignmentRules } from '@/campusVirtual'
 export type CourseGroup = { courseId: number; assignments: AssignmentRules[] }
 
 /** When an assignment stops being "upcoming": its due date, or its cut-off when it has none. */
-const endsAt = (rules: AssignmentRules) => rules.dueAt ?? rules.cutoffAt
+/** When submitting really stops: the cut-off when there is one (late submissions are open until
+ * then), else the due date. A student's extension isn't known in the list. */
+const endsAt = (rules: AssignmentRules) => rules.cutoffAt ?? rules.dueAt
 
 /** Soonest due first; no due date last; same date by name. */
 function bySoonest(a: AssignmentRules, b: AssignmentRules): number {

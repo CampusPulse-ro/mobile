@@ -197,7 +197,8 @@
       "due": "Termen: {{when}}",
       "noDueDate": "Fără termen",
       "opens": "Se deschide: {{when}}",
-      "closed": "Închisă"
+      "closed": "Închisă",
+      "cutoffPassed": "Termenul final a trecut"
     },
     "when": {
       "today": "azi, {{time}}",
@@ -252,7 +253,8 @@
       "noChanges": "Schimbă textul sau alege fișiere ca să salvezi.",
       "fixProblems": "Corectează ce e marcat cu roșu ca să salvezi.",
       "acceptStatement": "Acceptă declarația de mai sus ca să trimiți.",
-      "formattedText": "Textul are formatare (îngroșat, liste, linkuri sau imagini) pe care aplicația nu o poate afișa. Dacă salvezi aici o modificare, rămân doar cuvintele."
+      "formattedText": "Textul are formatare (îngroșat, liste, linkuri sau imagini) pe care aplicația nu o poate afișa. Dacă salvezi aici o modificare, rămân doar cuvintele.",
+      "embeddedFiles": "Textul online conține imagini, pe care o salvare din aplicație le-ar pierde. Modifică această lucrare pe Campus Virtual."
     },
     "limits": {
       "one": "1 fișier",
@@ -276,7 +278,8 @@
       "tooMany": "Prea multe fișiere: cel mult {{max}}.",
       "tooBig": "Prea mare: cel mult {{size}}.",
       "unknownSize": "Dimensiunea nu poate fi citită, așa că nu poate fi verificată.",
-      "wrongType": "Tip neacceptat (se acceptă: {{types}})."
+      "wrongType": "Tip neacceptat (se acceptă: {{types}}).",
+      "typesUnknown": "Această temă acceptă tipuri de fișiere pe care aplicația nu le poate verifica. Încarcă fișierele pe Campus Virtual."
     },
     "confirm": {
       "draftTitle": "Salvezi ciorna?",
@@ -320,7 +323,8 @@
       "expiredBefore": "Conexiunea cu Campus Virtual a expirat, așa că nu s-a trimis nimic. Reconectează-te din Profil.",
       "rejectedBefore": "Campus Virtual a refuzat cererea, așa că nu s-a trimis nimic: {{reason}}",
       "unreachableBefore": "Campus Virtual nu răspunde, așa că nu s-a trimis nimic. Verifică conexiunea la internet și încearcă din nou."
-    }
+    },
+    "statementFallback": "Confirm că această lucrare îmi aparține."
   },
   "language": {
     "en": "English",

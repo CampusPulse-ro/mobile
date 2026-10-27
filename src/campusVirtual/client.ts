@@ -72,7 +72,6 @@ export class CampusVirtualError extends Error {
   }
 }
 
-/** A write Moodle answered but did not carry out: `status: false`, or warnings (their messages). */
 /** What the student wants to send breaks the activity's rules (checked before any call). */
 export class CampusVirtualInputError extends Error {
   constructor(public readonly problems: readonly { kind: string }[]) {
@@ -81,6 +80,7 @@ export class CampusVirtualInputError extends Error {
   }
 }
 
+/** A write Moodle answered but did not carry out: `status: false`, or warnings (their messages). */
 export class CampusVirtualWriteError extends Error {
   constructor(public readonly reasons: string[]) {
     super(reasons.join(' ') || 'Campus Virtual did not make the change')

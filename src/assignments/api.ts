@@ -85,12 +85,11 @@ export function freshSubmission(
 function useAfterWrite() {
   const queryClient = useQueryClient()
   return {
-    onSuccess: async (state: SubmissionState, { rules }: { rules: AssignmentRules }) => {
+    onSuccess: (state: SubmissionState, { rules }: { rules: AssignmentRules }) => {
       queryClient.setQueryData(submissionKey(rules.id), state)
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: deadlinesKey }),
-        queryClient.invalidateQueries({ queryKey: assignmentsKey }),
-      ])
+      // Not awaited: the write is done, and the student shouldn't wait for these reloads.
+      void queryClient.invalidateQueries({ queryKey: deadlinesKey })
+      void queryClient.invalidateQueries({ queryKey: assignmentsKey })
     },
     // A refused or failed write may still mean the submission changed (or isn't what the cache
     // says): read it again, so the screen shows what Campus Virtual holds.
@@ -113,7 +112,7 @@ export function useSaveSubmission() {
       input,
     }: {
       rules: AssignmentRules
-      input: { text?: string; files?: SubmissionFile[] }
+      input: { text?: string; files?: SubmissionFile[]; acceptStatement?: boolean }
     }) => saveSubmission(rules, input),
     ...after,
   })

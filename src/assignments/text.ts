@@ -20,7 +20,8 @@ import { addDays, campusToday } from '@/timetable/dates'
 /** What the student is told after a write (or a refused one). */
 export type Outcome = { ok: boolean; text: string }
 
-type InputProblem = TextProblem | FileProblem | { kind: 'empty' } | { kind: 'statement' }
+type InputProblem =
+  TextProblem | FileProblem | { kind: 'empty' } | { kind: 'statement' } | { kind: 'embeddedFiles' }
 
 const KB = 1024
 
@@ -51,6 +52,10 @@ export function useAssignmentText() {
         return t('assignments.problem.empty')
       case 'statement':
         return t('assignments.problem.statement')
+      case 'embeddedFiles':
+        return t('assignments.edit.embeddedFiles')
+      case 'typesUnknown':
+        return t('assignments.problem.typesUnknown')
       case 'tooManyWords':
         return t('assignments.problem.tooManyWords', { words: p.words, limit: p.limit })
       case 'tooMany':

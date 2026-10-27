@@ -1,9 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'expo-router'
-import * as WebBrowser from 'expo-web-browser'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Alert, Linking, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native'
 
 import { useAssignments } from '@/assignments/api'
 import {
@@ -18,6 +17,7 @@ import {
   type Deadline,
 } from '@/campusVirtual'
 import { BottomSheet, SheetField } from '@/components/BottomSheet'
+import { openLink } from '@/components/openLink'
 import { Button } from '@/components/ui'
 import { useDateTimeFormat } from '@/i18n/format'
 import { color, radius, space, type } from '@/theme'
@@ -59,9 +59,6 @@ function Details({ deadline, onClose }: { deadline: Deadline; onClose: () => voi
     ? assignments.data?.find((rules) => rules.cmid === deadline.cmid)
     : undefined
 
-  const open = (link: string) => {
-    void WebBrowser.openBrowserAsync(link).catch(() => Linking.openURL(link))
-  }
   const openAssignment = (id: number, cmid: number) => {
     onClose()
     router.push({ pathname: '/assignment/[id]', params: { id: String(id), cmid: String(cmid) } })
@@ -102,7 +99,7 @@ function Details({ deadline, onClose }: { deadline: Deadline; onClose: () => voi
           <Button
             label={t('deadlines.detail.open')}
             variant={assignment ? 'secondary' : 'primary'}
-            onPress={() => open(url)}
+            onPress={() => openLink(url)}
           />
         ) : null}
         <Button label={t('deadlines.detail.close')} variant="secondary" onPress={onClose} />

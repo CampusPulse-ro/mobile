@@ -30,7 +30,11 @@ export type AssignmentRules = {
   drafts: boolean
   statement: string | null
   onlineText: { wordLimit: number | null } | null
-  files: { maxFiles: number; maxBytes: number; types: string[] } | null
+  /**
+   * `types`: accepted extensions (".pdf"), empty = any. `unknownTypes`: the teacher's list holds a
+   * type the app can't turn into extensions, so it can't check files and doesn't upload any.
+   */
+  files: { maxFiles: number; maxBytes: number; types: string[]; unknownTypes: boolean } | null
 }
 
 export type SubmissionStatus = 'none' | 'new' | 'draft' | 'submitted' | 'reopened'
@@ -107,18 +111,78 @@ export function parseAssignment(raw: RawAssignment, course?: RawCourse): Assignm
       ? {
           maxFiles: Number(config('file', 'maxfilesubmissions')) || 1,
           maxBytes: Number(config('file', 'maxsubmissionsizebytes')) || 0,
-          types: fileTypes(config('file', 'filetypeslist') ?? ''),
+          ...fileTypes(config('file', 'filetypeslist') ?? ''),
         }
       : null,
   }
 }
 
-/** Moodle's accepted-types list: extensions (".pdf") kept; groups and MIME types are left to Moodle. */
-function fileTypes(list: string): string[] {
-  return list
+/**
+ * Moodle's type groups (`core_filetypes`), only the common ones and only the extensions of each that
+ * Moodle lists: a group missing here makes the list unknown (no uploads from the app), never "any".
+ */
+const TYPE_GROUPS: Record<string, string[]> = {
+  document: ['.doc', '.docx', '.epub', '.gdoc', '.odm', '.odt', '.oth', '.ott', '.pdf', '.rtf'],
+  image: [
+    '.bmp',
+    '.gif',
+    '.ico',
+    '.jpe',
+    '.jpeg',
+    '.jpg',
+    '.png',
+    '.svg',
+    '.svgz',
+    '.tif',
+    '.tiff',
+    '.webp',
+  ],
+  web_image: ['.gif', '.jpe', '.jpeg', '.jpg', '.png', '.svg', '.svgz', '.webp'],
+  audio: [
+    '.aac',
+    '.aif',
+    '.aifc',
+    '.aiff',
+    '.flac',
+    '.m4a',
+    '.mp3',
+    '.oga',
+    '.ogg',
+    '.wav',
+    '.wma',
+  ],
+  video: ['.3gp', '.avi', '.flv', '.m4v', '.mov', '.mp4', '.mpeg', '.mpg', '.ogv', '.webm', '.wmv'],
+  archive: ['.7z', '.gz', '.gzip', '.rar', '.tar', '.tgz', '.zip'],
+  spreadsheet: ['.csv', '.ods', '.ots', '.xls', '.xlsm', '.xlsx'],
+  presentation: ['.odp', '.otp', '.pps', '.ppsx', '.ppt', '.pptm', '.pptx'],
+}
+
+const MIME_EXTENSIONS: Record<string, string[]> = {
+  'application/pdf': ['.pdf'],
+  'application/zip': ['.zip'],
+  'application/msword': ['.doc'],
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation': ['.pptx'],
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+  'image/jpeg': ['.jpe', '.jpeg', '.jpg'],
+  'image/png': ['.png'],
+  'text/plain': ['.txt'],
+}
+
+/** Moodle's accepted-types list (extensions, groups, MIME types) as extensions. */
+export function fileTypes(list: string): { types: string[]; unknownTypes: boolean } {
+  const types = new Set<string>()
+  let unknownTypes = false
+  for (const token of list
     .split(/[\s,;]+/)
     .map((t) => t.trim().toLowerCase())
-    .filter((t) => t.startsWith('.'))
+    .filter(Boolean)) {
+    if (token === '*') return { types: [], unknownTypes: false }
+    const known = token.startsWith('.') ? [token] : (TYPE_GROUPS[token] ?? MIME_EXTENSIONS[token])
+    if (known) known.forEach((type) => types.add(type))
+    else unknownTypes = true
+  }
+  return { types: [...types], unknownTypes }
 }
 
 type RawFile = { filename?: string; filesize?: number; fileurl?: string; mimetype?: string }
@@ -222,6 +286,7 @@ export function checkText(text: string, rules: AssignmentRules): TextProblem | n
 export type PickedFile = { name: string; bytes: number | null; mimeType: string | null }
 
 export type FileProblem =
+  | { kind: 'typesUnknown' }
   | { kind: 'tooMany'; max: number }
   | { kind: 'tooBig'; name: string; maxBytes: number }
   | { kind: 'unknownSize'; name: string }
@@ -232,6 +297,7 @@ export function checkFiles(files: PickedFile[], rules: AssignmentRules): FilePro
   const limits = rules.files
   if (!limits) return []
   const problems: FileProblem[] = []
+  if (files.length > 0 && limits.unknownTypes) return [{ kind: 'typesUnknown' }]
   if (files.length > limits.maxFiles) problems.push({ kind: 'tooMany', max: limits.maxFiles })
   for (const file of files) {
     const extension = file.name.includes('.') ? `.${file.name.split('.').pop()!.toLowerCase()}` : ''
@@ -272,6 +338,15 @@ export function submitForGradingParams(
   acceptStatement: boolean,
 ): Record<string, number> {
   return { assignmentid: rules.id, acceptsubmissionstatement: acceptStatement ? 1 : 0 }
+}
+
+/**
+ * Whether an online text has files embedded in it (images pasted on the website). Any save from the
+ * app would drop them: the app can't carry them into a new draft area. Such a submission is
+ * changed on Campus Virtual only.
+ */
+export function hasEmbeddedFiles(html: string): boolean {
+  return html.includes('@@PLUGINFILE@@')
 }
 
 /** Plain text the student typed, as the HTML Moodle stores: escaped, one paragraph per line. */

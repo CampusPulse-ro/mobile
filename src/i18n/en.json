@@ -197,7 +197,8 @@
       "due": "Due {{when}}",
       "noDueDate": "No due date",
       "opens": "Opens {{when}}",
-      "closed": "Closed"
+      "closed": "Closed",
+      "cutoffPassed": "Cut-off passed"
     },
     "when": {
       "today": "today, {{time}}",
@@ -252,7 +253,8 @@
       "noChanges": "Change the text or choose files to save.",
       "fixProblems": "Fix what's marked in red to save.",
       "acceptStatement": "Accept the statement above to submit.",
-      "formattedText": "This text has formatting (bold, lists, links or images) that the app can't show. Saving a change here keeps only the words."
+      "formattedText": "This text has formatting (bold, lists, links or images) that the app can't show. Saving a change here keeps only the words.",
+      "embeddedFiles": "Your online text has images in it, which a save from the app would lose. Change this submission on Campus Virtual."
     },
     "limits": {
       "one": "1 file",
@@ -276,7 +278,8 @@
       "tooMany": "Too many files: at most {{max}}.",
       "tooBig": "Too big: at most {{size}}.",
       "unknownSize": "Its size can't be read, so it can't be checked against the limit.",
-      "wrongType": "Not an accepted type (accepted: {{types}})."
+      "wrongType": "Not an accepted type (accepted: {{types}}).",
+      "typesUnknown": "This assignment accepts file types the app can't check. Submit files on Campus Virtual."
     },
     "confirm": {
       "draftTitle": "Save draft?",
@@ -320,7 +323,8 @@
       "expiredBefore": "Your Campus Virtual connection has expired, so nothing was sent. Reconnect it on Profile.",
       "rejectedBefore": "Campus Virtual turned the request down, so nothing was sent: {{reason}}",
       "unreachableBefore": "Couldn't reach Campus Virtual, so nothing was sent. Check your internet connection and try again."
-    }
+    },
+    "statementFallback": "I confirm this submission is my own work."
   },
   "language": {
     "en": "English",
