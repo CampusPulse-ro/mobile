@@ -154,6 +154,8 @@ export function getCourseCompletion(courseId: number): Promise<ActivityCompletio
   )
 }
 
+const VALIDATED_FOR_MS = 60_000
+
 /**
  * Marks an activity done (or not done) on Campus Virtual: the app's first write. The caller has
  * already confirmed it with the student. Checks first, from a fresh read, that Moodle allows it
@@ -164,13 +166,20 @@ export function getCourseCompletion(courseId: number): Promise<ActivityCompletio
 export async function setManualCompletion(
   deadline: Deadline,
   done: boolean,
+  validated?: { status: ActivityCompletion; readAt: number },
 ): Promise<ActivityCompletion[]> {
   const courseId = deadline.course?.id
   if (courseId === undefined || deadline.cmid === null) throw new CampusVirtualNotAllowedError()
-  const before = await getCourseCompletion(courseId)
-  if (before === null) throw new CampusVirtualExpiredError()
-  const status = completionFor(deadline, before)
-  if (!canMarkManually(status)) throw new CampusVirtualNotAllowedError()
+  // A status the caller read and checked moments ago (before its confirmation) is fresh enough;
+  // anything older is read again, so what's written still matches what Moodle allows.
+  let status =
+    validated && Date.now() - validated.readAt < VALIDATED_FOR_MS ? validated.status : null
+  if (!status) {
+    const before = await getCourseCompletion(courseId)
+    if (before === null) throw new CampusVirtualExpiredError()
+    status = completionFor(deadline, before) ?? null
+  }
+  if (!status || !canMarkManually(status)) throw new CampusVirtualNotAllowedError()
 
   await withToken((token) =>
     callWrite('core_completion_update_activity_completion_status_manually', token, {

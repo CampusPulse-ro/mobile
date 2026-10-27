@@ -1,5 +1,6 @@
 export {
   getAccessToken,
+  isSignedIn,
   loadSession,
   signIn,
   signOut,

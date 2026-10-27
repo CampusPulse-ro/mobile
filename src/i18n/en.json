@@ -243,7 +243,9 @@
       "notPicked": "Not picked",
       "weeks": "weeks {{weeks}}",
       "none": "Nothing to choose",
-      "noneAbout": "Your group has no optional subjects or times to pick. You're all set."
+      "noneAbout": "Your group has no optional subjects or times to pick. You're all set.",
+      "missingTimeTitle": "Pick a time",
+      "missingTime": "Pick a time for: {{subjects}}."
     },
     "skip": "Skip",
     "done": "Done",

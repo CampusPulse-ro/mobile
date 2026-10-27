@@ -3,7 +3,7 @@
  * A room's day sits under `['rooms', code, 'timetable', date]`, so the list can show the status of
  * a room whose day is already loaded without asking the server again.
  */
-import { queryOptions, useQueries, useQuery } from '@tanstack/react-query'
+import { queryOptions, useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { api, unwrap } from '@/api/client'
 import type { components } from '@/api/schema'
@@ -42,14 +42,17 @@ export function useRoomTimetable(code: string, date: string) {
 }
 
 /**
- * Several rooms' days at once, in the order of `codes`. Only the first `fetchFirst` rooms are
- * requested (one request each); the others return only what's already cached, with no request.
+ * Several rooms' days at once, in the order of `codes`: the full query for the first `fetchFirst`
+ * rooms (one request each), and for the rest only what's already cached. Observing every room
+ * would rebuild hundreds of idle observers on each keystroke for nothing.
  */
 export function useRoomTimetables(codes: string[], date: string, fetchFirst: number) {
-  return useQueries({
-    queries: codes.map((code, index) => ({
-      ...roomTimetableQuery(code, date),
-      enabled: index < fetchFirst,
-    })),
+  const queryClient = useQueryClient()
+  const fetched = useQueries({
+    queries: codes.slice(0, fetchFirst).map((code) => roomTimetableQuery(code, date)),
   })
+  const cached = codes
+    .slice(fetchFirst)
+    .map((code) => ({ data: queryClient.getQueryData(roomTimetableQuery(code, date).queryKey) }))
+  return { fetched, cached }
 }

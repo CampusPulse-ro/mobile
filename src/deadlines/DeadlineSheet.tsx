@@ -2,8 +2,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import * as WebBrowser from 'expo-web-browser'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Alert, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Alert, Linking, ScrollView, StyleSheet, Text, View } from 'react-native'
 
 import {
   CampusVirtualError,
@@ -13,8 +12,10 @@ import {
   canMarkManually,
   completionFor,
   isDone,
+  type ActivityCompletion,
   type Deadline,
 } from '@/campusVirtual'
+import { BottomSheet, SheetField } from '@/components/BottomSheet'
 import { Button } from '@/components/ui'
 import { useDateTimeFormat } from '@/i18n/format'
 import { color, radius, space, type } from '@/theme'
@@ -34,32 +35,10 @@ export function DeadlineSheet({
   deadline: Deadline | null
   onClose: () => void
 }) {
-  const insets = useSafeAreaInsets()
-  // Keep the last deadline on screen while the sheet slides away.
-  const [shown, setShown] = useState(deadline)
-  if (deadline && deadline !== shown) setShown(deadline)
-
   return (
-    <Modal
-      visible={deadline !== null}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-      statusBarTranslucent
-      navigationBarTranslucent
-    >
-      <View style={styles.backdrop}>
-        <Pressable
-          style={[StyleSheet.absoluteFill, styles.scrim]}
-          onPress={onClose}
-          importantForAccessibility="no"
-        />
-        <View style={[styles.sheet, { paddingBottom: insets.bottom + space.lg }]}>
-          <View style={styles.handle} />
-          {shown ? <Details key={shown.id} deadline={shown} onClose={onClose} /> : null}
-        </View>
-      </View>
-    </Modal>
+    <BottomSheet item={deadline} onClose={onClose}>
+      {(shown) => <Details key={shown.id} deadline={shown} onClose={onClose} />}
+    </BottomSheet>
   )
 }
 
@@ -84,15 +63,15 @@ function Details({ deadline, onClose }: { deadline: Deadline; onClose: () => voi
         ) : null}
       </View>
 
-      <Field value={text.module(deadline)} label={t('deadlines.detail.type')} />
-      <Field value={format.dateTime(deadline.dueAt)} label={text.dueLabel(deadline)} />
+      <SheetField value={text.module(deadline)} label={t('deadlines.detail.type')} />
+      <SheetField value={format.dateTime(deadline.dueAt)} label={text.dueLabel(deadline)} />
       {deadline.overdue ? (
         <View style={styles.overdue}>
           <Text style={styles.overdueText}>{t('deadlines.overdue')}</Text>
         </View>
       ) : null}
       {deadline.actionName ? (
-        <Field value={deadline.actionName} label={t('deadlines.detail.action')} />
+        <SheetField value={deadline.actionName} label={t('deadlines.detail.action')} />
       ) : null}
 
       <Completion deadline={deadline} />
@@ -154,9 +133,9 @@ function Completion({ deadline }: { deadline: Deadline }) {
     return { ok: false, text: t('deadlines.completion.unreachable') }
   }
 
-  const write = (done: boolean) => {
+  const write = (done: boolean, validated: { status: ActivityCompletion; readAt: number }) => {
     setCompletion.mutate(
-      { deadline, done },
+      { deadline, done, validated },
       {
         onSuccess: (statuses) => {
           const after = completionFor(deadline, statuses)
@@ -182,7 +161,7 @@ function Completion({ deadline }: { deadline: Deadline }) {
     setChecking(true)
     // The cached status may be old: what the student confirms is what Moodle says now.
     const read = await freshCourseCompletion(queryClient, courseId).then(
-      (statuses) => ({ fresh: completionFor(deadline, statuses ?? []) }),
+      (statuses) => ({ fresh: completionFor(deadline, statuses ?? []), readAt: Date.now() }),
       (error: unknown) => {
         setOutcome(failure(error))
         return null
@@ -190,7 +169,7 @@ function Completion({ deadline }: { deadline: Deadline }) {
     )
     setChecking(false)
     if (!read) return
-    const { fresh } = read
+    const { fresh, readAt } = read
     if (!canMarkManually(fresh)) {
       setOutcome({ ok: false, text: t('deadlines.completion.notAllowed') })
       return
@@ -208,7 +187,7 @@ function Completion({ deadline }: { deadline: Deadline }) {
         { text: t('deadlines.completion.cancel'), style: 'cancel', isPreferred: true },
         {
           text: done ? t('deadlines.completion.markDone') : t('deadlines.completion.markNotDone'),
-          onPress: () => write(done),
+          onPress: () => write(done, { status: fresh, readAt }),
         },
       ],
       { cancelable: true },
@@ -219,7 +198,7 @@ function Completion({ deadline }: { deadline: Deadline }) {
     <View style={styles.completion}>
       {status && allowed ? (
         <>
-          <Field
+          <SheetField
             value={
               isDone(status) ? t('deadlines.completion.done') : t('deadlines.completion.notDone')
             }
@@ -249,41 +228,11 @@ function Completion({ deadline }: { deadline: Deadline }) {
   )
 }
 
-function Field({ value, label }: { value: string; label: string }) {
-  return (
-    <View style={styles.field} accessible>
-      <Text style={styles.value}>{value}</Text>
-      <Text style={styles.label}>{label}</Text>
-    </View>
-  )
-}
-
 const styles = StyleSheet.create({
-  backdrop: { flex: 1, justifyContent: 'flex-end' },
-  scrim: { backgroundColor: color.sunken, opacity: 0.75 },
-  sheet: {
-    maxHeight: '85%',
-    backgroundColor: color.raised,
-    borderTopLeftRadius: radius.lg,
-    borderTopRightRadius: radius.lg,
-    borderTopWidth: 1,
-    borderColor: color.line,
-  },
-  handle: {
-    alignSelf: 'center',
-    width: 36,
-    height: 4,
-    marginTop: space.sm,
-    borderRadius: radius.pill,
-    backgroundColor: color.lineStrong,
-  },
   content: { padding: space.xl, gap: space.lg },
   header: { gap: space.xs },
   title: { ...type.heading, color: color.ink },
   subtitle: { ...type.bodySmall, color: color.inkMuted },
-  field: { gap: 2 },
-  value: { ...type.body, color: color.ink },
-  label: { ...type.caption, color: color.inkMuted },
   overdue: {
     alignSelf: 'flex-start',
     paddingHorizontal: space.sm,

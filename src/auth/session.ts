@@ -20,6 +20,8 @@ import * as SecureStore from 'expo-secure-store'
 import * as WebBrowser from 'expo-web-browser'
 import { useSyncExternalStore } from 'react'
 
+import { disconnect as disconnectCampusVirtual } from '@/campusVirtual'
+
 import { CLIENT_ID, discovery, REDIRECT_URI, SCOPES } from './config'
 
 WebBrowser.maybeCompleteAuthSession()
@@ -50,35 +52,72 @@ export function useSession(): State {
 
 // --- the refresh token in SecureStore, in chunks ---
 
+/**
+ * Each save writes the chunks under a new generation (`.g<n>.<i>`) and only then points `.current`
+ * (`"<n>:<parts>"`) at it, so a crash or a failed write half-way keeps the previous token: Microsoft
+ * has already rotated it, and losing both would sign the student out. Old chunks are deleted last.
+ * Tokens saved before generations (`.count` + `.<i>`) are still read once, then removed.
+ */
 const KEY = 'auth.refreshToken'
 const CHUNK = 1800
 
-async function saveRefreshToken(value: string | undefined) {
-  await clearRefreshToken()
-  if (!value) return
-  const parts = Math.ceil(value.length / CHUNK)
-  for (let i = 0; i < parts; i++) {
-    await SecureStore.setItemAsync(`${KEY}.${i}`, value.slice(i * CHUNK, (i + 1) * CHUNK))
-  }
-  await SecureStore.setItemAsync(`${KEY}.count`, String(parts))
+async function readPointer(): Promise<{ gen: number; parts: number } | null> {
+  const [gen, parts] = ((await SecureStore.getItemAsync(`${KEY}.current`)) ?? '')
+    .split(':')
+    .map(Number)
+  return gen > 0 && parts > 0 ? { gen, parts } : null
 }
 
-async function readRefreshToken(): Promise<string | null> {
-  const count = Number(await SecureStore.getItemAsync(`${KEY}.count`))
-  if (!count) return null
+async function readChunks(prefix: string, parts: number): Promise<string | null> {
   let value = ''
-  for (let i = 0; i < count; i++) {
-    const part = await SecureStore.getItemAsync(`${KEY}.${i}`)
+  for (let i = 0; i < parts; i++) {
+    const part = await SecureStore.getItemAsync(`${prefix}.${i}`)
     if (part === null) return null
     value += part
   }
   return value
 }
 
-async function clearRefreshToken() {
+async function deleteChunks(prefix: string, parts: number) {
+  for (let i = 0; i < parts; i++) await SecureStore.deleteItemAsync(`${prefix}.${i}`)
+}
+
+async function clearLegacy() {
   const count = Number(await SecureStore.getItemAsync(`${KEY}.count`)) || 0
   await SecureStore.deleteItemAsync(`${KEY}.count`)
-  for (let i = 0; i < Math.max(count, 8); i++) await SecureStore.deleteItemAsync(`${KEY}.${i}`)
+  await deleteChunks(KEY, Math.max(count, 8))
+}
+
+async function saveRefreshToken(value: string | undefined) {
+  if (!value) return clearRefreshToken()
+  const old = await readPointer()
+  const gen = (old?.gen ?? 0) + 1
+  const parts = Math.ceil(value.length / CHUNK)
+  for (let i = 0; i < parts; i++) {
+    await SecureStore.setItemAsync(`${KEY}.g${gen}.${i}`, value.slice(i * CHUNK, (i + 1) * CHUNK))
+  }
+  await SecureStore.setItemAsync(`${KEY}.current`, `${gen}:${parts}`)
+  // The new token is safe now; leftovers of the old one only cost space.
+  try {
+    if (old) await deleteChunks(`${KEY}.g${old.gen}`, old.parts)
+    await clearLegacy()
+  } catch {
+    // Removed on the next save or sign-out.
+  }
+}
+
+async function readRefreshToken(): Promise<string | null> {
+  const pointer = await readPointer()
+  if (pointer) return readChunks(`${KEY}.g${pointer.gen}`, pointer.parts)
+  const legacy = Number(await SecureStore.getItemAsync(`${KEY}.count`))
+  return legacy ? readChunks(KEY, legacy) : null
+}
+
+async function clearRefreshToken() {
+  const pointer = await readPointer()
+  await SecureStore.deleteItemAsync(`${KEY}.current`)
+  if (pointer) await deleteChunks(`${KEY}.g${pointer.gen}`, pointer.parts)
+  await clearLegacy()
 }
 
 // --- refreshing ---
@@ -91,18 +130,27 @@ function isRefused(error: unknown): boolean {
 
 let refreshing: Promise<TokenResponse | null> | null = null
 
+/**
+ * Bumped by every sign-in and sign-out. A refresh that finishes after one of them belongs to a
+ * session that is over: its tokens are dropped, never saved (they'd sign the old student back in).
+ */
+let epoch = 0
+
 async function refresh(refreshToken: string): Promise<TokenResponse | null> {
+  const started = epoch
   try {
     const next = await refreshAsync(
       { clientId: CLIENT_ID, refreshToken, scopes: SCOPES },
       discovery,
     )
+    if (started !== epoch || state.status !== 'signedIn') return null
     // Microsoft rotates refresh tokens; keep the old one only if it sent none.
     if (!next.refreshToken) next.refreshToken = refreshToken
     tokens = next
     await saveRefreshToken(next.refreshToken)
     return next
   } catch (error) {
+    if (started !== epoch) return null
     if (isRefused(error)) {
       await signOut('expired')
       return null
@@ -112,9 +160,16 @@ async function refresh(refreshToken: string): Promise<TokenResponse | null> {
 }
 
 /** Reads the stored session once, at app start. Offline still counts as signed in. */
+const LOAD_TIMEOUT_MS = 4000
+
 export async function loadSession(): Promise<void> {
   try {
-    const refreshToken = await readRefreshToken()
+    // A Keystore read that never answers (seen on some Android devices) must not keep the splash
+    // up forever: after the timeout the student signs in again.
+    const refreshToken = await Promise.race([
+      readRefreshToken(),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), LOAD_TIMEOUT_MS)),
+    ])
     if (!refreshToken) return setState({ status: 'signedOut', notice: null })
     setState({ status: 'signedIn', notice: null })
     // Get an access token now, so the first screen's requests don't each wait for one.
@@ -186,18 +241,29 @@ export async function signIn(
     discovery,
   )
   await createAccount(next.accessToken)
+  epoch++
   tokens = next
   await saveRefreshToken(next.refreshToken)
   setState({ status: 'signedIn', notice: null })
   return 'signedIn'
 }
 
-/** Drops the tokens. `notice` says why on the sign-in screen (deleted elsewhere, expired). */
+/**
+ * Drops the tokens, and the Campus Virtual connection with them: its token is full access to the
+ * student's Moodle account and must not stay for whoever signs in next. `notice` says why on the
+ * sign-in screen (deleted elsewhere, expired).
+ */
 export async function signOut(notice: State['notice'] = null): Promise<void> {
+  epoch++
   tokens = null
   try {
-    await clearRefreshToken()
+    await Promise.allSettled([clearRefreshToken(), disconnectCampusVirtual()])
   } finally {
     setState({ status: 'signedOut', notice })
   }
+}
+
+/** Whether a student is signed in right now (the API client's 401 handling asks). */
+export function isSignedIn(): boolean {
+  return state.status === 'signedIn'
 }

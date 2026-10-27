@@ -1,7 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native'
+import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { EmptyState, ErrorState, LoadingState } from '@/components/States'
@@ -103,11 +103,26 @@ export default function SubjectsStep() {
           })
           .map((s) => ({ subjectId: s.id, offeredSlotId: pickOf(s).slot }))
       : []
-    const drops = withSubjects
-      ? optional
-          .filter((s) => !pickOf(s).on && mine.data?.some((m) => m.subjectId === s.id))
-          .map((s) => s.id)
+    // A subject everyone takes at a time they pick can't be left without a time: say which.
+    const missingTime = withSubjects
+      ? subjects.filter(
+          (s) => s.choice === 'pickSlot' && s.offers.length > 0 && pickOf(s).slot === null,
+        )
       : []
+    if (missingTime.length > 0) {
+      Alert.alert(
+        t('setup.subjects.missingTimeTitle'),
+        t('setup.subjects.missingTime', { subjects: missingTime.map((s) => s.name).join(', ') }),
+      )
+      return
+    }
+    // Drop every saved pick that no longer applies: turned off here, or (after a group change)
+    // a subject the new group doesn't offer. Skip keeps the picks the new group still has.
+    const pickedIds = new Set(picks.map((p) => p.subjectId))
+    const offeredIds = new Set(subjects.map((s) => s.id))
+    const drops = (mine.data ?? [])
+      .filter((m) => (withSubjects ? !pickedIds.has(m.subjectId) : !offeredIds.has(m.subjectId)))
+      .map((m) => m.subjectId)
     save.mutate({ groupId, picks, drops }, { onSuccess: () => router.replace('/') })
   }
 

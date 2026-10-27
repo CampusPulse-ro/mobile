@@ -45,19 +45,20 @@ export default function RoomsScreen() {
   const [refreshing, setRefreshing] = useState(false)
 
   const matching = sortRooms(rooms.data ?? []).filter((room) => matchesSearch(room, query))
-  const days = useRoomTimetables(
+  const { fetched, cached } = useRoomTimetables(
     matching.map((room) => room.code),
     today,
     freeOnly ? FREE_CHECK_LIMIT : 0,
   )
+  const dayData = [...fetched.map((query) => query.data), ...cached.map((entry) => entry.data)]
   const statuses = new Map<string, RoomStatus>()
   matching.forEach((room, index) => {
-    const day = days[index]?.data
+    const day = dayData[index]
     if (day) statuses.set(room.code, roomStatus(day.occurrences, today, now))
   })
 
   const checked = matching.slice(0, FREE_CHECK_LIMIT)
-  const checkedDays = days.slice(0, FREE_CHECK_LIMIT)
+  const checkedDays = fetched
   const checking = freeOnly && checkedDays.some((day) => day.isPending)
   const failed = freeOnly ? checkedDays.filter((day) => day.isError && !day.data) : []
   const shown = freeOnly

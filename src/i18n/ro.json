@@ -243,7 +243,9 @@
       "notPicked": "Nealeasă",
       "weeks": "săptămânile {{weeks}}",
       "none": "Nimic de ales",
-      "noneAbout": "Grupa ta nu are materii opționale sau ore de ales. Totul e gata."
+      "noneAbout": "Grupa ta nu are materii opționale sau ore de ales. Totul e gata.",
+      "missingTimeTitle": "Alege o oră",
+      "missingTime": "Alege o oră pentru: {{subjects}}."
     },
     "skip": "Sari peste",
     "done": "Gata",

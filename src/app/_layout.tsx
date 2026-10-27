@@ -83,13 +83,12 @@ function Routes() {
 
   // The splash covers only the first answer; later loading (right after sign-in) keeps the
   // navigator mounted, so its state isn't thrown away.
+  // Set while rendering (React's pattern for state derived from a change), not in an effect.
   const [started, setStarted] = useState(false)
+  if (!started && phase !== 'loading') setStarted(true)
   useEffect(() => {
-    if (phase !== 'loading' && !started) {
-      setStarted(true)
-      void SplashScreen.hideAsync()
-    }
-  }, [phase, started])
+    if (started) void SplashScreen.hideAsync()
+  }, [started])
 
   // Move to the screen the new phase belongs on: the guards alone leave a screen that just became
   // unavailable (sign-in, right after signing in) on the "unmatched route" page. The first
@@ -98,12 +97,13 @@ function Routes() {
   const previous = useRef<string>('loading')
   useEffect(() => {
     if (phase === 'loading' || phase === previous.current) return
-    const first = previous.current === 'loading' && !started
+    // `previous` skips 'loading', so it is still 'loading' only for the first answer at launch.
+    const first = previous.current === 'loading'
     previous.current = phase
     if (phase === 'signedOut') router.replace('/sign-in')
     else if (phase === 'setup') router.replace('/setup')
     else if (!first) router.replace('/')
-  }, [phase, router, started])
+  }, [phase, router])
 
   // Keep this phone's push token fresh at our API on every launch, once notifications are allowed.
   useEffect(() => {
@@ -119,6 +119,7 @@ function Routes() {
       </Stack.Protected>
       <Stack.Protected guard={signedIn && !needsSetup}>
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="room/[code]" />
       </Stack.Protected>
       {/* Open whenever signed in, so "Pick my group again" can come back to it. */}
       <Stack.Protected guard={signedIn}>

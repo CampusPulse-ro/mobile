@@ -68,8 +68,15 @@ export function freshCourseCompletion(
 export function useSetCompletion() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ deadline, done }: { deadline: Deadline; done: boolean }) =>
-      setManualCompletion(deadline, done),
+    mutationFn: ({
+      deadline,
+      done,
+      validated,
+    }: {
+      deadline: Deadline
+      done: boolean
+      validated?: { status: ActivityCompletion; readAt: number }
+    }) => setManualCompletion(deadline, done, validated),
     onSuccess: async (statuses, { deadline }) => {
       if (deadline.course) queryClient.setQueryData(completionKey(deadline.course.id), statuses)
       await queryClient.invalidateQueries({ queryKey: deadlinesKey })

@@ -5,7 +5,7 @@
  */
 import createClient from 'openapi-fetch'
 
-import { getAccessToken, signOut } from '@/auth'
+import { getAccessToken, isSignedIn, signOut } from '@/auth'
 import { apiBase } from '@/config'
 
 import type { paths } from './schema'
@@ -64,7 +64,10 @@ api.use({
     if (token) request.headers.set('Authorization', `Bearer ${token}`)
   },
   async onResponse({ request, response }) {
-    if (response.status === 401 && request.headers.has('Authorization')) await signOut('expired')
+    // Only a signed-in session can expire: a 401 during sign-in (POST /me) is that attempt's error.
+    if (response.status === 401 && request.headers.has('Authorization') && isSignedIn()) {
+      await signOut('expired')
+    }
   },
 })
 
