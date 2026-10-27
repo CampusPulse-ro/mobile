@@ -9,6 +9,13 @@
  */
 const TOKEN_LINK = /^campuspulse:\/\/\/?token=/i
 
+/**
+ * Microsoft sign-in returns to `campuspulse://auth?code=…` (src/auth). Same handling: the open
+ * auth session takes it; on a cold start the attempt is gone (the code is useless without its
+ * PKCE verifier), so the app just opens.
+ */
+const AUTH_LINK = /^(campuspulse:\/\/)?\/?auth(\?|\/|$)/i
+
 export function redirectSystemPath({
   path,
   initial,
@@ -18,6 +25,13 @@ export function redirectSystemPath({
 }): string | null {
   try {
     if (TOKEN_LINK.test(path)) return initial ? '/profile' : null
+    if (AUTH_LINK.test(path)) {
+      console.warn(
+        '[auth] redirect link reached the router',
+        initial ? '(cold start)' : '(ignored)',
+      )
+      return initial ? '/' : null
+    }
     return path
   } catch {
     return initial ? '/' : null

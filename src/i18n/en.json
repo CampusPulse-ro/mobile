@@ -2,20 +2,93 @@
   "tabs": {
     "today": "Today",
     "timetable": "Timetable",
-    "map": "Map",
+    "map": "Rooms",
     "profile": "Profile"
   },
   "today": {
     "title": "Today",
-    "about": "Your classes and deadlines for today."
+    "about": "Your classes and deadlines for today.",
+    "noGroup": "Choose your group",
+    "noGroupAbout": "Pick your programme, year and group once, and your classes show up here.",
+    "chooseGroup": "Choose your group",
+    "oneClass": "1 class",
+    "classes": "{{count}} classes",
+    "noClasses": "No classes today",
+    "noClassesShort": "No classes",
+    "nonTeachingDay": "Non-teaching day",
+    "break": "Break",
+    "holidayAbout": "Non-teaching day: {{reason}}.",
+    "breakAbout": "Classes start again on {{date}}.",
+    "weekend": "It's the weekend.",
+    "next": "Next: {{day}} at {{time}}, {{subject}}.",
+    "groupFromAnotherSemester": "Your group is from another semester. Pick your group for this one.",
+    "groupNoLongerOffered": "Your group isn't in the current timetable any more. Pick it again.",
+    "pickGroupAgain": "Pick my group again",
+    "notes": "For your year"
   },
   "timetable": {
     "title": "Timetable",
-    "about": "Your weekly courses and labs."
+    "about": "Your weekly courses and labs.",
+    "today": "Today",
+    "now": "Now",
+    "finished": "finished",
+    "openDetail": "Shows the class details",
+    "week": "week {{week}}",
+    "weekTitle": "Week {{week}}",
+    "previousWeek": "Previous week",
+    "nextWeek": "Next week",
+    "thisWeek": "Back to this week",
+    "noClasses": "No classes",
+    "detail": {
+      "when": "{{date}} · week {{week}}",
+      "room": "Room",
+      "teacher": "Teacher",
+      "note": "Note",
+      "optional": "Optional subject",
+      "optionalAbout": "You chose it in the timetable setup",
+      "openCampusVirtual": "Open in Campus Virtual",
+      "close": "Close"
+    },
+    "layout": "View",
+    "layouts": {
+      "list": "List",
+      "week": "Week"
+    }
   },
-  "map": {
-    "title": "Map",
-    "about": "Campus buildings and rooms."
+  "rooms": {
+    "title": "Rooms",
+    "search": "Search by room or building",
+    "searchLabel": "Search rooms",
+    "clearSearch": "Clear the search",
+    "freeNowFilter": "Only rooms free now",
+    "capped": "Checks only the first rooms in the list (at most {{n}}). Search to narrow it down.",
+    "checking": "Checking which rooms are free…",
+    "checkFailed": "Couldn't check some rooms ({{n}})",
+    "noRooms": "No rooms yet",
+    "noRoomsAbout": "This semester's timetable hasn't been loaded yet. Check back later.",
+    "noMatch": "No room matches “{{query}}”",
+    "noFreeRooms": "None of these rooms is free right now",
+    "noBuilding": "Other rooms",
+    "floor": "floor {{floor}}",
+    "capacity": "{{n}} seats",
+    "openDay": "Shows what's on in this room today",
+    "freeNow": "Free now",
+    "freeUntil": "Free until {{time}}",
+    "inUseUntil": "In use until {{time}}",
+    "nowOn": "Now: {{subject}}",
+    "next": "Next: {{time}} {{subject}}",
+    "nothingElseToday": "Nothing else scheduled today",
+    "day": {
+      "back": "Back",
+      "previousDay": "Previous day",
+      "nextDay": "Next day",
+      "backToToday": "Back to today",
+      "empty": "Nothing scheduled in this room today",
+      "emptyOn": "Nothing scheduled in this room that day",
+      "notFound": "No such room",
+      "offered": "Offered slot",
+      "offeredAbout": "For the students who pick this slot"
+    }
   },
   "profile": {
     "title": "Profile",
@@ -38,6 +111,64 @@
     "errorRejected": "Campus Virtual turned the request down ({{code}}). Try again later, or disconnect and connect again.",
     "retry": "Try again"
   },
+  "deadlines": {
+    "title": "Due soon",
+    "loading": "Loading your deadlines…",
+    "failed": "Couldn't load your Campus Virtual deadlines.",
+    "retry": "Try again",
+    "empty": "Nothing due in the next 14 days.",
+    "connect": "Connect Campus Virtual on Profile to see your deadlines here.",
+    "expired": "Your Campus Virtual connection has expired. Reconnect it on Profile.",
+    "overdue": "Overdue",
+    "dueToday": "Today, {{time}}",
+    "dueTomorrow": "Tomorrow, {{time}}",
+    "dueOn": "{{day}}, {{time}}",
+    "openDetail": "Shows the deadline details",
+    "module": {
+      "assign": "Assignment",
+      "quiz": "Quiz",
+      "forum": "Forum",
+      "data": "Database",
+      "lesson": "Lesson",
+      "workshop": "Workshop",
+      "choice": "Choice",
+      "feedback": "Feedback",
+      "scorm": "SCORM package",
+      "h5pactivity": "H5P activity",
+      "bigbluebuttonbn": "BigBlueButton meeting",
+      "lti": "External tool",
+      "glossary": "Glossary",
+      "other": "Activity"
+    },
+    "detail": {
+      "type": "Type",
+      "due": "Due",
+      "closes": "Closes",
+      "expected": "Expected to be done by",
+      "action": "To do",
+      "completion": "Completion",
+      "open": "Open in Campus Virtual",
+      "close": "Close"
+    },
+    "completion": {
+      "done": "You marked it as done.",
+      "notDone": "Not marked as done yet.",
+      "markDone": "Mark as done",
+      "markNotDone": "Mark as not done",
+      "confirmTitleDone": "Mark as done?",
+      "confirmTitleNotDone": "Mark as not done?",
+      "confirmDone": "Mark “{{name}}” in {{course}} as done on Campus Virtual?",
+      "confirmNotDone": "Mark “{{name}}” in {{course}} as not done on Campus Virtual?",
+      "cancel": "Cancel",
+      "savedDone": "Marked as done on Campus Virtual.",
+      "savedNotDone": "Marked as not done on Campus Virtual.",
+      "notAllowed": "Campus Virtual doesn't let you change this activity by hand any more.",
+      "notRecorded": "Campus Virtual answered, but the change doesn't show there. Check the activity on Campus Virtual.",
+      "failed": "Campus Virtual didn't make the change.",
+      "failedReason": "Campus Virtual didn't make the change: {{reason}}",
+      "unreachable": "Couldn't reach Campus Virtual. Check your internet connection and try again."
+    }
+  },
   "language": {
     "en": "English",
     "ro": "Română"
@@ -54,5 +185,96 @@
     "title": "Nothing here",
     "about": "This link doesn't open anything in CampusPulse.",
     "home": "Go to Today"
+  },
+  "auth": {
+    "brand": "CampusPulse",
+    "welcome": "Your UPT timetable, always at hand",
+    "about": "Today's classes, the week at a glance and your Campus Virtual courses. Sign in with your UPT account to start.",
+    "signIn": "Sign in with your UPT account",
+    "signingIn": "Signing in…",
+    "failed": "Sign-in didn't finish. Try again.",
+    "unofficial": "CampusPulse is a student project, not an official UPT app.",
+    "notice": {
+      "accountGone": "Your account was deleted, so you've been signed out.",
+      "expired": "Your session expired. Sign in again."
+    },
+    "account": "Account",
+    "signOut": "Sign out"
+  },
+  "classKind": {
+    "course": "Course",
+    "lab": "Lab",
+    "seminar": "Seminar",
+    "project": "Project",
+    "facultative": "Facultative"
+  },
+  "setup": {
+    "title": "Timetable setup",
+    "back": "Back",
+    "step": "Step {{n}} of 3 · {{name}}",
+    "steps": {
+      "programme": "Programme",
+      "group": "Group",
+      "subjects": "Subjects"
+    },
+    "programme": {
+      "heading": "Your programme",
+      "about": "Pick the programme you study."
+    },
+    "noProgrammes": "No programmes yet",
+    "noProgrammesAbout": "This semester's timetable hasn't been loaded yet. Check back later.",
+    "group": {
+      "heading": "Your year and group",
+      "year": "Year",
+      "yearN": "Year {{year}}",
+      "group": "Group",
+      "groupAbout": "1.2 means group 1, subgroup 2: labs follow the subgroup.",
+      "pickYear": "Pick your year first.",
+      "noGroups": "This programme has no groups in this semester's timetable.",
+      "next": "Next: your optional subjects. You can change all of it later."
+    },
+    "continue": "Continue",
+    "subjects": {
+      "heading": "Optional subjects",
+      "about": "Turn on the optional subjects you take, and pick a time where there's a choice. You can skip this step.",
+      "everyonePicks": "Everyone picks a time",
+      "optional": "Optional subjects · {{picked}} of {{total}} picked",
+      "pickTime": "Pick a time",
+      "notPicked": "Not picked",
+      "weeks": "weeks {{weeks}}",
+      "none": "Nothing to choose",
+      "noneAbout": "Your group has no optional subjects or times to pick. You're all set.",
+      "missingTimeTitle": "Pick a time",
+      "missingTime": "Pick a time for: {{subjects}}."
+    },
+    "skip": "Skip",
+    "done": "Done",
+    "saveFailed": "Couldn't save your choices. Try again."
+  },
+  "states": {
+    "loadFailed": "Couldn't load this",
+    "refreshFailed": "Couldn't refresh: showing what was loaded earlier."
+  },
+  "push": {
+    "title": "Class reminders",
+    "about": "Get a notification before your classes. Allow notifications to turn them on.",
+    "on": "Notifications are on for this phone.",
+    "turnOn": "Turn on reminders",
+    "test": "Send me a test notification",
+    "testSent": "Sent: it should arrive in a few seconds.",
+    "noDevices": "This phone isn't registered yet. Try again in a moment.",
+    "wait": "One test a minute. Try again shortly.",
+    "blocked": "Notifications are off for CampusPulse in Android's settings.",
+    "failed": "That didn't work. Check your connection and try again."
+  },
+  "deleteAccount": {
+    "about": "Deleting your account removes your group, your subjects and this phone from CampusPulse.",
+    "button": "Delete account",
+    "title": "Delete your account?",
+    "confirm": "Your group, your optional subjects and your devices are deleted. This can't be undone.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "failedTitle": "Not deleted",
+    "failed": "Your account wasn't deleted. Check your connection and try again."
   }
 }

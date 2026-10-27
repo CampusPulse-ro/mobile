@@ -5,6 +5,7 @@
  */
 import createClient from 'openapi-fetch'
 
+import { getAccessToken, isSignedIn, signOut } from '@/auth'
 import { apiBase } from '@/config'
 
 import type { paths } from './schema'
@@ -48,6 +49,33 @@ function fetchWithTimeout(request: Request): Promise<Response> {
 }
 
 export const api = createClient<paths>({ baseUrl: apiBase, fetch: fetchWithTimeout })
+
+/**
+ * Every request carries the signed-in student's access token (none when signed out; the public
+ * endpoints don't need one). A 401 on a request that had one means Microsoft's session is gone:
+ * sign out, so the student sees the sign-in screen instead of errors.
+ */
+api.use({
+  // Both hooks change nothing they return: openapi-fetch accepts a returned value only as a
+  // replacement, and React Native's Request/Response classes can fail its instanceof check.
+  async onRequest({ request }) {
+    if (request.headers.has('Authorization')) return
+    const token = await getAccessToken()
+    if (token) request.headers.set('Authorization', `Bearer ${token}`)
+  },
+  async onResponse({ request, response }) {
+    // Only a signed-in session can expire: a 401 during sign-in (POST /me) is that attempt's error.
+    if (response.status === 401 && request.headers.has('Authorization') && isSignedIn()) {
+      await signOut('expired')
+    }
+  },
+})
+
+/** `POST /me` with the token from an interactive sign-in, before the session holds it. */
+export async function createAccount(accessToken: string): Promise<void> {
+  const result = await api.POST('/me', { headers: { Authorization: `Bearer ${accessToken}` } })
+  unwrap(result)
+}
 
 /** A response from our API that wasn't a success (the server answered, with an error status). */
 export class ApiError extends Error {

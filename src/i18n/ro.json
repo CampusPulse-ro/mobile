@@ -2,20 +2,93 @@
   "tabs": {
     "today": "Azi",
     "timetable": "Orar",
-    "map": "Hartă",
+    "map": "Săli",
     "profile": "Profil"
   },
   "today": {
     "title": "Azi",
-    "about": "Orele și termenele limită de azi."
+    "about": "Orele și termenele limită de azi.",
+    "noGroup": "Alege-ți grupa",
+    "noGroupAbout": "Alege o singură dată specializarea, anul și grupa, iar orele tale apar aici.",
+    "chooseGroup": "Alege grupa",
+    "oneClass": "1 oră",
+    "classes": "{{count}} ore",
+    "noClasses": "Azi nu ai ore",
+    "noClassesShort": "Fără ore",
+    "nonTeachingDay": "Zi liberă",
+    "break": "Vacanță",
+    "holidayAbout": "Zi liberă: {{reason}}.",
+    "breakAbout": "Orele reîncep {{date}}.",
+    "weekend": "E weekend.",
+    "next": "Următoarea: {{day}}, la {{time}}, {{subject}}.",
+    "groupFromAnotherSemester": "Grupa ta este dintr-un alt semestru. Alege-ți grupa pentru semestrul acesta.",
+    "groupNoLongerOffered": "Grupa ta nu mai apare în orarul actual. Alege-o din nou.",
+    "pickGroupAgain": "Alege din nou grupa",
+    "notes": "Pentru anul tău"
   },
   "timetable": {
     "title": "Orar",
-    "about": "Cursurile și laboratoarele tale săptămânale."
+    "about": "Cursurile și laboratoarele tale săptămânale.",
+    "today": "Azi",
+    "now": "Acum",
+    "finished": "încheiată",
+    "openDetail": "Arată detaliile orei",
+    "week": "săptămâna {{week}}",
+    "weekTitle": "Săptămâna {{week}}",
+    "previousWeek": "Săptămâna anterioară",
+    "nextWeek": "Săptămâna următoare",
+    "thisWeek": "Înapoi la săptămâna aceasta",
+    "noClasses": "Nicio oră",
+    "detail": {
+      "when": "{{date}} · săptămâna {{week}}",
+      "room": "Sala",
+      "teacher": "Cadru didactic",
+      "note": "Observație",
+      "optional": "Materie opțională",
+      "optionalAbout": "Ai ales-o la configurarea orarului",
+      "openCampusVirtual": "Deschide în Campus Virtual",
+      "close": "Închide"
+    },
+    "layout": "Vizualizare",
+    "layouts": {
+      "list": "Listă",
+      "week": "Săptămână"
+    }
   },
-  "map": {
-    "title": "Hartă",
-    "about": "Clădirile și sălile din campus."
+  "rooms": {
+    "title": "Săli",
+    "search": "Caută după sală sau clădire",
+    "searchLabel": "Caută săli",
+    "clearSearch": "Șterge căutarea",
+    "freeNowFilter": "Doar sălile libere acum",
+    "capped": "Se verifică doar primele săli din listă (cel mult {{n}}). Caută ca să restrângi lista.",
+    "checking": "Se verifică ce săli sunt libere…",
+    "checkFailed": "Unele săli nu au putut fi verificate ({{n}})",
+    "noRooms": "Nicio sală încă",
+    "noRoomsAbout": "Orarul semestrului nu a fost încă încărcat. Revino mai târziu.",
+    "noMatch": "Nicio sală nu se potrivește cu „{{query}}”",
+    "noFreeRooms": "Niciuna dintre aceste săli nu e liberă acum",
+    "noBuilding": "Alte săli",
+    "floor": "etajul {{floor}}",
+    "capacity": "capacitate {{n}}",
+    "openDay": "Arată ce se ține azi în sală",
+    "freeNow": "Liberă acum",
+    "freeUntil": "Liberă până la {{time}}",
+    "inUseUntil": "Ocupată până la {{time}}",
+    "nowOn": "Acum: {{subject}}",
+    "next": "Urmează: {{time}} {{subject}}",
+    "nothingElseToday": "Nimic altceva programat azi",
+    "day": {
+      "back": "Înapoi",
+      "previousDay": "Ziua anterioară",
+      "nextDay": "Ziua următoare",
+      "backToToday": "Înapoi la azi",
+      "empty": "Nimic programat azi în această sală",
+      "emptyOn": "Nimic programat în această sală în acea zi",
+      "notFound": "Sala nu există",
+      "offered": "Interval oferit",
+      "offeredAbout": "Pentru studenții care aleg acest interval"
+    }
   },
   "profile": {
     "title": "Profil",
@@ -38,6 +111,64 @@
     "errorRejected": "Campus Virtual a refuzat cererea ({{code}}). Încearcă mai târziu sau deconectează-te și conectează-te din nou.",
     "retry": "Încearcă din nou"
   },
+  "deadlines": {
+    "title": "Termene apropiate",
+    "loading": "Se încarcă termenele…",
+    "failed": "Nu s-au putut încărca termenele din Campus Virtual.",
+    "retry": "Încearcă din nou",
+    "empty": "Niciun termen în următoarele 14 zile.",
+    "connect": "Conectează Campus Virtual din Profil ca să-ți vezi aici termenele.",
+    "expired": "Conexiunea cu Campus Virtual a expirat. Reconectează-te din Profil.",
+    "overdue": "Termen depășit",
+    "dueToday": "Azi, {{time}}",
+    "dueTomorrow": "Mâine, {{time}}",
+    "dueOn": "{{day}}, {{time}}",
+    "openDetail": "Arată detaliile termenului",
+    "module": {
+      "assign": "Temă",
+      "quiz": "Test",
+      "forum": "Forum",
+      "data": "Bază de date",
+      "lesson": "Lecție",
+      "workshop": "Atelier",
+      "choice": "Alegere",
+      "feedback": "Feedback",
+      "scorm": "Pachet SCORM",
+      "h5pactivity": "Activitate H5P",
+      "bigbluebuttonbn": "Întâlnire BigBlueButton",
+      "lti": "Instrument extern",
+      "glossary": "Glosar",
+      "other": "Activitate"
+    },
+    "detail": {
+      "type": "Tip",
+      "due": "Termen",
+      "closes": "Se închide",
+      "expected": "De finalizat până la",
+      "action": "De făcut",
+      "completion": "Finalizare",
+      "open": "Deschide în Campus Virtual",
+      "close": "Închide"
+    },
+    "completion": {
+      "done": "Ai marcat-o ca finalizată.",
+      "notDone": "Nu e marcată ca finalizată.",
+      "markDone": "Marchează ca finalizată",
+      "markNotDone": "Marchează ca nefinalizată",
+      "confirmTitleDone": "Marchezi ca finalizată?",
+      "confirmTitleNotDone": "Marchezi ca nefinalizată?",
+      "confirmDone": "Marchezi „{{name}}” de la {{course}} ca finalizată în Campus Virtual?",
+      "confirmNotDone": "Marchezi „{{name}}” de la {{course}} ca nefinalizată în Campus Virtual?",
+      "cancel": "Anulează",
+      "savedDone": "Marcată ca finalizată în Campus Virtual.",
+      "savedNotDone": "Marcată ca nefinalizată în Campus Virtual.",
+      "notAllowed": "Campus Virtual nu mai permite să schimbi manual această activitate.",
+      "notRecorded": "Campus Virtual a răspuns, dar schimbarea nu apare acolo. Verifică activitatea în Campus Virtual.",
+      "failed": "Campus Virtual nu a făcut schimbarea.",
+      "failedReason": "Campus Virtual nu a făcut schimbarea: {{reason}}",
+      "unreachable": "Campus Virtual nu răspunde. Verifică conexiunea la internet și încearcă din nou."
+    }
+  },
   "language": {
     "en": "English",
     "ro": "Română"
@@ -54,5 +185,96 @@
     "title": "Nu e nimic aici",
     "about": "Linkul acesta nu deschide nimic în CampusPulse.",
     "home": "Mergi la Azi"
+  },
+  "auth": {
+    "brand": "CampusPulse",
+    "welcome": "Orarul tău UPT, mereu la îndemână",
+    "about": "Cursurile de azi, săptămâna dintr-o privire și cursurile tale de pe Campus Virtual. Conectează-te cu contul UPT ca să începi.",
+    "signIn": "Conectează-te cu contul UPT",
+    "signingIn": "Se conectează…",
+    "failed": "Conectarea nu s-a încheiat. Încearcă din nou.",
+    "unofficial": "CampusPulse este un proiect studențesc, nu o aplicație oficială UPT.",
+    "notice": {
+      "accountGone": "Contul tău a fost șters, așa că ai fost deconectat.",
+      "expired": "Sesiunea a expirat. Conectează-te din nou."
+    },
+    "account": "Cont",
+    "signOut": "Deconectează-te"
+  },
+  "classKind": {
+    "course": "Curs",
+    "lab": "Laborator",
+    "seminar": "Seminar",
+    "project": "Proiect",
+    "facultative": "Facultativ"
+  },
+  "setup": {
+    "title": "Configurarea orarului",
+    "back": "Înapoi",
+    "step": "Pasul {{n}} din 3 · {{name}}",
+    "steps": {
+      "programme": "Specializare",
+      "group": "Grupă",
+      "subjects": "Materii"
+    },
+    "programme": {
+      "heading": "Specializarea ta",
+      "about": "Alege specializarea la care studiezi."
+    },
+    "noProgrammes": "Nicio specializare încă",
+    "noProgrammesAbout": "Orarul semestrului nu a fost încă încărcat. Revino mai târziu.",
+    "group": {
+      "heading": "Anul și grupa ta",
+      "year": "An",
+      "yearN": "Anul {{year}}",
+      "group": "Grupă",
+      "groupAbout": "1.2 înseamnă grupa 1, semigrupa 2: laboratoarele urmează semigrupa.",
+      "pickYear": "Alege mai întâi anul.",
+      "noGroups": "Specializarea nu are grupe în orarul acestui semestru.",
+      "next": "Urmează materiile opționale. Le poți schimba pe toate mai târziu."
+    },
+    "continue": "Continuă",
+    "subjects": {
+      "heading": "Materii opționale",
+      "about": "Activează materiile opționale pe care le urmezi și alege ora acolo unde ai de ales. Poți sări peste acest pas.",
+      "everyonePicks": "Toți aleg o oră",
+      "optional": "Materii opționale · {{picked}} din {{total}} alese",
+      "pickTime": "Alege o oră",
+      "notPicked": "Nealeasă",
+      "weeks": "săptămânile {{weeks}}",
+      "none": "Nimic de ales",
+      "noneAbout": "Grupa ta nu are materii opționale sau ore de ales. Totul e gata.",
+      "missingTimeTitle": "Alege o oră",
+      "missingTime": "Alege o oră pentru: {{subjects}}."
+    },
+    "skip": "Sari peste",
+    "done": "Gata",
+    "saveFailed": "Alegerile nu au putut fi salvate. Încearcă din nou."
+  },
+  "states": {
+    "loadFailed": "Nu s-a putut încărca",
+    "refreshFailed": "Nu s-a putut actualiza: se arată datele încărcate mai devreme."
+  },
+  "push": {
+    "title": "Notificări pentru cursuri",
+    "about": "Primești o notificare înainte de cursuri. Permite notificările ca să le activezi.",
+    "on": "Notificările sunt active pe acest telefon.",
+    "turnOn": "Activează notificările",
+    "test": "Trimite-mi o notificare de test",
+    "testSent": "Trimisă: ar trebui să ajungă în câteva secunde.",
+    "noDevices": "Telefonul nu este încă înregistrat. Încearcă din nou imediat.",
+    "wait": "Un test pe minut. Încearcă din nou puțin mai târziu.",
+    "blocked": "Notificările pentru CampusPulse sunt oprite din setările Android.",
+    "failed": "Nu a funcționat. Verifică conexiunea și încearcă din nou."
+  },
+  "deleteAccount": {
+    "about": "Ștergerea contului elimină grupa, materiile tale și acest telefon din CampusPulse.",
+    "button": "Șterge contul",
+    "title": "Ștergi contul?",
+    "confirm": "Grupa, materiile opționale și dispozitivele tale sunt șterse. Acțiunea nu poate fi anulată.",
+    "cancel": "Anulează",
+    "delete": "Șterge",
+    "failedTitle": "Contul nu a fost șters",
+    "failed": "Contul nu a fost șters. Verifică conexiunea și încearcă din nou."
   }
 }
