@@ -93,7 +93,10 @@ let refreshing: Promise<TokenResponse | null> | null = null
 
 async function refresh(refreshToken: string): Promise<TokenResponse | null> {
   try {
-    const next = await refreshAsync({ clientId: CLIENT_ID, refreshToken, scopes: SCOPES }, discovery)
+    const next = await refreshAsync(
+      { clientId: CLIENT_ID, refreshToken, scopes: SCOPES },
+      discovery,
+    )
     // Microsoft rotates refresh tokens; keep the old one only if it sent none.
     if (!next.refreshToken) next.refreshToken = refreshToken
     tokens = next
@@ -149,7 +152,9 @@ export type SignInResult = 'signedIn' | 'cancelled'
  * The interactive sign-in: Microsoft's page in an in-app browser tab, the code exchanged with PKCE,
  * then `POST /me` (passed in, so this module doesn't import the API client that imports it).
  */
-export async function signIn(createAccount: (accessToken: string) => Promise<void>): Promise<SignInResult> {
+export async function signIn(
+  createAccount: (accessToken: string) => Promise<void>,
+): Promise<SignInResult> {
   const request = new AuthRequest({
     clientId: CLIENT_ID,
     scopes: SCOPES,

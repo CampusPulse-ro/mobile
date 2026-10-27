@@ -58,13 +58,33 @@ export function useDateTimeFormat() {
   const { i18n } = useTranslation()
   const language = isLanguage(i18n.resolvedLanguage) ? i18n.resolvedLanguage : currentLanguage()
   const time = { ...timeOptions, ...deviceHourCycle() }
+  const formatTime = (value: Date | number) => formatDateTime(value, time, language)
   return {
     /** "Wednesday 14 October" / "miercuri, 14 octombrie" */
     date: (value: Date | number) => formatDateTime(value, dateOptions, language),
     /** "12:30" (or "12:30 pm" on a 12-hour phone) */
-    time: (value: Date | number) => formatDateTime(value, time, language),
+    time: formatTime,
     /** both */
     dateTime: (value: Date | number) =>
       formatDateTime(value, { ...dateOptions, ...time }, language),
+    /** "Wednesday" / "Miercuri": a weekday on its own, capitalised as a label */
+    weekday: (value: Date | number) =>
+      capitalise(formatDateTime(value, { weekday: 'long' }, language)),
+    /** "Wed" / "Mie" */
+    weekdayShort: (value: Date | number) =>
+      capitalise(formatDateTime(value, { weekday: 'short' }, language)),
+    /** "14 October" / "14 octombrie" */
+    dayMonth: (value: Date | number) =>
+      formatDateTime(value, { day: 'numeric', month: 'long' }, language),
+    /** "14" */
+    day: (value: Date | number) => formatDateTime(value, { day: 'numeric' }, language),
+    /** "12:00–14:00" */
+    timeRange: (start: Date | number, end: Date | number) =>
+      `${formatTime(start)}–${formatTime(end)}`,
   }
+}
+
+/** Romanian writes weekdays in lower case; as a label on their own they start with a capital. */
+function capitalise(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1)
 }

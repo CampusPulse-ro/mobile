@@ -24,7 +24,10 @@ export default function ProfileScreen() {
 /** Who is signed in (`GET /me`), and Sign out. */
 function AccountCard() {
   const { t } = useTranslation()
-  const me = useQuery({ queryKey: ['me', 'account'], queryFn: async () => unwrap(await api.GET('/me')) })
+  const me = useQuery({
+    queryKey: ['me', 'account'],
+    queryFn: async () => unwrap(await api.GET('/me')),
+  })
   return (
     <View style={styles.card}>
       <Heading>{t('auth.account')}</Heading>

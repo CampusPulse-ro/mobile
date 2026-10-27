@@ -7,11 +7,53 @@
   },
   "today": {
     "title": "Today",
-    "about": "Your classes and deadlines for today."
+    "about": "Your classes and deadlines for today.",
+    "noGroup": "Choose your group",
+    "noGroupAbout": "Pick your programme, year and group once, and your classes show up here.",
+    "chooseGroup": "Choose your group",
+    "oneClass": "1 class",
+    "classes": "{{count}} classes",
+    "noClasses": "No classes today",
+    "noClassesShort": "No classes",
+    "nonTeachingDay": "Non-teaching day",
+    "break": "Break",
+    "holidayAbout": "Non-teaching day: {{reason}}.",
+    "breakAbout": "Classes start again on {{date}}.",
+    "weekend": "It's the weekend.",
+    "next": "Next: {{day}} at {{time}}, {{subject}}.",
+    "groupFromAnotherSemester": "Your group is from another semester. Pick your group for this one.",
+    "groupNoLongerOffered": "Your group isn't in the current timetable any more. Pick it again.",
+    "pickGroupAgain": "Pick my group again",
+    "notes": "For your year"
   },
   "timetable": {
     "title": "Timetable",
-    "about": "Your weekly courses and labs."
+    "about": "Your weekly courses and labs.",
+    "today": "Today",
+    "now": "Now",
+    "finished": "finished",
+    "openDetail": "Shows the class details",
+    "week": "week {{week}}",
+    "weekTitle": "Week {{week}}",
+    "previousWeek": "Previous week",
+    "nextWeek": "Next week",
+    "thisWeek": "Back to this week",
+    "noClasses": "No classes",
+    "detail": {
+      "when": "{{date}} · week {{week}}",
+      "room": "Room",
+      "teacher": "Teacher",
+      "note": "Note",
+      "optional": "Optional subject",
+      "optionalAbout": "You chose it in the timetable setup",
+      "openCampusVirtual": "Open in Campus Virtual",
+      "close": "Close"
+    },
+    "layout": "View",
+    "layouts": {
+      "list": "List",
+      "week": "Week"
+    }
   },
   "map": {
     "title": "Map",
@@ -54,5 +96,72 @@
     "title": "Nothing here",
     "about": "This link doesn't open anything in CampusPulse.",
     "home": "Go to Today"
+  },
+  "auth": {
+    "brand": "CampusPulse",
+    "welcome": "Your UPT timetable, always at hand",
+    "about": "Today's classes, the week at a glance and your Campus Virtual courses. Sign in with your UPT account to start.",
+    "signIn": "Sign in with your UPT account",
+    "signingIn": "Signing in…",
+    "failed": "Sign-in didn't finish. Try again.",
+    "unofficial": "CampusPulse is a student project, not an official UPT app.",
+    "notice": {
+      "accountGone": "Your account was deleted, so you've been signed out.",
+      "expired": "Your session expired. Sign in again."
+    },
+    "account": "Account",
+    "signOut": "Sign out"
+  },
+  "classKind": {
+    "course": "Course",
+    "lab": "Lab",
+    "seminar": "Seminar",
+    "project": "Project",
+    "facultative": "Facultative"
+  },
+  "setup": {
+    "title": "Timetable setup",
+    "back": "Back",
+    "step": "Step {{n}} of 3 · {{name}}",
+    "steps": {
+      "programme": "Programme",
+      "group": "Group",
+      "subjects": "Subjects"
+    },
+    "programme": {
+      "heading": "Your programme",
+      "about": "Pick the programme you study."
+    },
+    "noProgrammes": "No programmes yet",
+    "noProgrammesAbout": "This semester's timetable hasn't been loaded yet. Check back later.",
+    "group": {
+      "heading": "Your year and group",
+      "year": "Year",
+      "yearN": "Year {{year}}",
+      "group": "Group",
+      "groupAbout": "1.2 means group 1, subgroup 2: labs follow the subgroup.",
+      "pickYear": "Pick your year first.",
+      "noGroups": "This programme has no groups in this semester's timetable.",
+      "next": "Next: your optional subjects. You can change all of it later."
+    },
+    "continue": "Continue",
+    "subjects": {
+      "heading": "Optional subjects",
+      "about": "Turn on the optional subjects you take, and pick a time where there's a choice. You can skip this step.",
+      "everyonePicks": "Everyone picks a time",
+      "optional": "Optional subjects · {{picked}} of {{total}} picked",
+      "pickTime": "Pick a time",
+      "notPicked": "Not picked",
+      "weeks": "weeks {{weeks}}",
+      "none": "Nothing to choose",
+      "noneAbout": "Your group has no optional subjects or times to pick. You're all set."
+    },
+    "skip": "Skip",
+    "done": "Done",
+    "saveFailed": "Couldn't save your choices. Try again."
+  },
+  "states": {
+    "loadFailed": "Couldn't load this",
+    "refreshFailed": "Couldn't refresh: showing what was loaded earlier."
   }
 }

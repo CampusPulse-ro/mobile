@@ -1,13 +1,14 @@
-import { QueryClientProvider, useQuery } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { DarkTheme, Stack, ThemeProvider } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect, useState } from 'react'
 
-import { api, ApiError, unwrap } from '@/api/client'
+import { ApiError } from '@/api/client'
 import { queryClient } from '@/api/queryClient'
 import { loadSession, signOut, useSession } from '@/auth'
 import { loadSavedLanguage } from '@/i18n'
+import { useSettings } from '@/timetable'
 import { color } from '@/theme'
 
 void SplashScreen.preventAutoHideAsync()
@@ -55,11 +56,7 @@ export default function RootLayout() {
 function Routes() {
   const { status } = useSession()
   const signedIn = status === 'signedIn'
-  const settings = useQuery({
-    queryKey: ['me', 'settings'],
-    queryFn: async () => unwrap(await api.GET('/me/settings')),
-    enabled: signedIn,
-  })
+  const settings = useSettings({ enabled: signedIn })
 
   // No account behind a valid token: deleted, maybe from another device. Sign out and say why.
   const accountGone = settings.error instanceof ApiError && settings.error.status === 404
