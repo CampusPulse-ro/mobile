@@ -56,15 +56,15 @@ export const api = createClient<paths>({ baseUrl: apiBase, fetch: fetchWithTimeo
  * sign out, so the student sees the sign-in screen instead of errors.
  */
 api.use({
+  // Both hooks change nothing they return: openapi-fetch accepts a returned value only as a
+  // replacement, and React Native's Request/Response classes can fail its instanceof check.
   async onRequest({ request }) {
-    if (request.headers.has('Authorization')) return request
+    if (request.headers.has('Authorization')) return
     const token = await getAccessToken()
     if (token) request.headers.set('Authorization', `Bearer ${token}`)
-    return request
   },
   async onResponse({ request, response }) {
     if (response.status === 401 && request.headers.has('Authorization')) await signOut('expired')
-    return response
   },
 })
 
