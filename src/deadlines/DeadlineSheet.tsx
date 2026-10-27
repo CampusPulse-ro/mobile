@@ -1,9 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query'
-import * as WebBrowser from 'expo-web-browser'
+import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Alert, Linking, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native'
 
+import { useAssignments } from '@/assignments/api'
 import {
   CampusVirtualError,
   CampusVirtualExpiredError,
@@ -16,6 +17,7 @@ import {
   type Deadline,
 } from '@/campusVirtual'
 import { BottomSheet, SheetField } from '@/components/BottomSheet'
+import { openLink } from '@/components/openLink'
 import { Button } from '@/components/ui'
 import { useDateTimeFormat } from '@/i18n/format'
 import { color, radius, space, type } from '@/theme'
@@ -25,8 +27,9 @@ import { useDeadlineText } from './text'
 
 /**
  * A deadline's details in a bottom sheet (the same sheet as a class's): the activity, its course
- * and type, when it's due, what to do, a link to Campus Virtual and, when the activity's completion
- * is the student's to tick, "Mark as done". Open while `deadline` is set; `onClose` clears it.
+ * and type, when it's due, what to do, a link to Campus Virtual, "Open assignment" for an
+ * assignment the app knows and, when the activity's completion is the student's to tick, "Mark as
+ * done". Open while `deadline` is set; `onClose` clears it.
  */
 export function DeadlineSheet({
   deadline,
@@ -46,10 +49,19 @@ function Details({ deadline, onClose }: { deadline: Deadline; onClose: () => voi
   const { t } = useTranslation()
   const format = useDateTimeFormat()
   const text = useDeadlineText()
+  const router = useRouter()
   const url = deadline.url
+  // An assignment's event carries its cmid; the assignment's own id comes from the list (only
+  // loaded for assignments). Not in the list: no button, the Campus Virtual link still works.
+  const isAssignment = deadline.module === 'assign' && deadline.cmid !== null
+  const assignments = useAssignments({ enabled: isAssignment })
+  const assignment = isAssignment
+    ? assignments.data?.find((rules) => rules.cmid === deadline.cmid)
+    : undefined
 
-  const open = (link: string) => {
-    void WebBrowser.openBrowserAsync(link).catch(() => Linking.openURL(link))
+  const openAssignment = (id: number, cmid: number) => {
+    onClose()
+    router.push({ pathname: '/assignment/[id]', params: { id: String(id), cmid: String(cmid) } })
   }
 
   return (
@@ -77,7 +89,19 @@ function Details({ deadline, onClose }: { deadline: Deadline; onClose: () => voi
       <Completion deadline={deadline} />
 
       <View style={styles.actions}>
-        {url ? <Button label={t('deadlines.detail.open')} onPress={() => open(url)} /> : null}
+        {assignment ? (
+          <Button
+            label={t('assignments.openAssignment')}
+            onPress={() => openAssignment(assignment.id, assignment.cmid)}
+          />
+        ) : null}
+        {url ? (
+          <Button
+            label={t('deadlines.detail.open')}
+            variant={assignment ? 'secondary' : 'primary'}
+            onPress={() => openLink(url)}
+          />
+        ) : null}
         <Button label={t('deadlines.detail.close')} variant="secondary" onPress={onClose} />
       </View>
     </ScrollView>

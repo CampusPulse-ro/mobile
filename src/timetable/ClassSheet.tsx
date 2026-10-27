@@ -1,8 +1,8 @@
-import * as WebBrowser from 'expo-web-browser'
 import { useTranslation } from 'react-i18next'
-import { Linking, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 
 import { BottomSheet, SheetField } from '@/components/BottomSheet'
+import { openLink } from '@/components/openLink'
 import { Button } from '@/components/ui'
 import { useDateTimeFormat } from '@/i18n/format'
 import { color, space, type } from '@/theme'
@@ -37,10 +37,6 @@ function Details({ occurrence, onClose }: { occurrence: Occurrence; onClose: () 
   const endsAt = campusInstant(occurrence.date, occurrence.endsAt)
   const day = campusNoon(occurrence.date)
   const url = occurrence.campusVirtualUrl
-
-  const open = (link: string) => {
-    void WebBrowser.openBrowserAsync(link).catch(() => Linking.openURL(link))
-  }
 
   return (
     <ScrollView contentContainerStyle={styles.content}>
@@ -78,7 +74,7 @@ function Details({ occurrence, onClose }: { occurrence: Occurrence; onClose: () 
 
       <View style={styles.actions}>
         {url ? (
-          <Button label={t('timetable.detail.openCampusVirtual')} onPress={() => open(url)} />
+          <Button label={t('timetable.detail.openCampusVirtual')} onPress={() => openLink(url)} />
         ) : null}
         <Button label={t('timetable.detail.close')} variant="secondary" onPress={onClose} />
       </View>
