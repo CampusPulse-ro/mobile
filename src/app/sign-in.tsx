@@ -7,7 +7,7 @@ import { signIn, useSession } from '@/auth'
 import { Button, Muted, Screen } from '@/components/ui'
 import { color, space } from '@/theme'
 
-type Problem = 'failed' | null
+type Problem = string | null
 
 /** Welcome: what the app does and one button, Microsoft sign-in with a UPT account. */
 export default function SignInScreen() {
@@ -21,8 +21,10 @@ export default function SignInScreen() {
     setProblem(null)
     try {
       await signIn(createAccount)
-    } catch {
-      setProblem('failed')
+    } catch (error) {
+      const reason = error instanceof Error ? error.message.slice(0, 120) : String(error)
+      console.warn('[auth] sign-in failed:', reason)
+      setProblem(reason)
     } finally {
       setBusy(false)
     }
@@ -38,7 +40,7 @@ export default function SignInScreen() {
 
       <View style={styles.bottom}>
         {notice ? <Text style={styles.notice}>{t(`auth.notice.${notice}`)}</Text> : null}
-        {problem ? <Text style={styles.notice}>{t('auth.failed')}</Text> : null}
+        {problem ? <Text style={styles.notice}>{`${t('auth.failed')} (${problem})`}</Text> : null}
         <Button
           label={busy ? t('auth.signingIn') : t('auth.signIn')}
           onPress={() => void onSignIn()}

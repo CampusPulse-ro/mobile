@@ -14,7 +14,7 @@ const TOKEN_LINK = /^campuspulse:\/\/\/?token=/i
  * auth session takes it; on a cold start the attempt is gone (the code is useless without its
  * PKCE verifier), so the app just opens.
  */
-const AUTH_LINK = /^campuspulse:\/\/\/?auth(\?|$)/i
+const AUTH_LINK = /^(campuspulse:\/\/)?\/?auth(\?|\/|$)/i
 
 export function redirectSystemPath({
   path,
@@ -25,7 +25,13 @@ export function redirectSystemPath({
 }): string | null {
   try {
     if (TOKEN_LINK.test(path)) return initial ? '/profile' : null
-    if (AUTH_LINK.test(path)) return initial ? '/' : null
+    if (AUTH_LINK.test(path)) {
+      console.warn(
+        '[auth] redirect link reached the router',
+        initial ? '(cold start)' : '(ignored)',
+      )
+      return initial ? '/' : null
+    }
     return path
   } catch {
     return initial ? '/' : null

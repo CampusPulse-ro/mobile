@@ -163,8 +163,18 @@ export async function signIn(
     prompt: Prompt.SelectAccount,
   })
   const result = await request.promptAsync(discovery)
+  // Never the code or a token: only how the attempt ended, and Microsoft's error if any.
+  console.warn(
+    '[auth] sign-in page ended:',
+    result.type,
+    result.type === 'error'
+      ? `${result.params.error ?? ''} ${(result.params.error_description ?? '').slice(0, 160)}`
+      : '',
+  )
   if (result.type === 'cancel' || result.type === 'dismiss') return 'cancelled'
-  if (result.type !== 'success') throw new Error(`Sign-in ended with ${result.type}`)
+  if (result.type !== 'success') {
+    throw new Error(result.type === 'error' ? (result.params.error ?? 'error') : result.type)
+  }
 
   const next = await exchangeCodeAsync(
     {
