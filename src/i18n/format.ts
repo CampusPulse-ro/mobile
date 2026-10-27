@@ -76,6 +76,9 @@ export function useDateTimeFormat() {
     /** "14 October" / "14 octombrie" */
     dayMonth: (value: Date | number) =>
       formatDateTime(value, { day: 'numeric', month: 'long' }, language),
+    /** "14", or "2 pm" on a 12-hour phone: an hour on its own, for a time axis */
+    hour: (value: Date | number) =>
+      formatDateTime(value, { hour: 'numeric', ...deviceHourCycle() }, language),
     /** "14" */
     day: (value: Date | number) => formatDateTime(value, { day: 'numeric' }, language),
     /** "12:00–14:00" */

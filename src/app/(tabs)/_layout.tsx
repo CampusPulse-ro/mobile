@@ -15,7 +15,7 @@ export default function TabsLayout() {
     >
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>{t('tabs.today')}</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf={{ default: 'sun.max', selected: 'sun.max.fill' }} md="today" />
+        <NativeTabs.Trigger.Icon sf={{ default: 'sun.max', selected: 'sun.max.fill' }} md="sunny" />
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="timetable">
@@ -25,7 +25,10 @@ export default function TabsLayout() {
 
       <NativeTabs.Trigger name="map">
         <NativeTabs.Trigger.Label>{t('tabs.map')}</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf={{ default: 'map', selected: 'map.fill' }} md="map" />
+        <NativeTabs.Trigger.Icon
+          sf={{ default: 'door.left.hand.open', selected: 'door.left.hand.open' }}
+          md="meeting_room"
+        />
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="profile">

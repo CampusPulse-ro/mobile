@@ -74,7 +74,14 @@ export function WeekGrid({
       <View style={[styles.body, { height: height + space.sm }]}>
         {hours.map((hour) => (
           <View key={hour} style={[styles.hourLine, { top: (hour - firstHour) * HOUR }]}>
-            <Text style={styles.hourLabel}>{format.time(campusInstant(anyDay, `${hour}:00`))}</Text>
+            <Text
+              style={styles.hourLabel}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+            >
+              {format.hour(campusInstant(anyDay, `${hour}:00`))}
+            </Text>
           </View>
         ))}
         <View style={styles.gutter} />
@@ -135,7 +142,7 @@ export function WeekGrid({
   )
 }
 
-const GUTTER = 40
+const GUTTER = 44
 
 const styles = StyleSheet.create({
   headRow: { flexDirection: 'row', paddingBottom: space.sm },

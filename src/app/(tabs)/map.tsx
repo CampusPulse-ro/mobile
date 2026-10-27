@@ -63,6 +63,7 @@ export default function RoomsScreen() {
   const shown = freeOnly
     ? checked.filter((room) => statuses.get(room.code)?.kind === 'free')
     : matching
+  const sections = roomSections(shown, t('rooms.noBuilding'))
 
   const refresh = async () => {
     setRefreshing(true)
@@ -84,7 +85,7 @@ export default function RoomsScreen() {
   } else {
     body = (
       <SectionList
-        sections={roomSections(shown, t('rooms.noBuilding'))}
+        sections={sections}
         keyExtractor={(room) => room.code}
         renderItem={({ item }) => (
           <RoomRow
@@ -93,11 +94,14 @@ export default function RoomsScreen() {
             onPress={() => router.push({ pathname: '/room/[code]', params: { code: item.code } })}
           />
         )}
-        renderSectionHeader={({ section }) => (
-          <Text accessibilityRole="header" style={styles.section}>
-            {section.title}
-          </Text>
-        )}
+        // One group (most rooms have no building in the timetable) needs no heading.
+        renderSectionHeader={({ section }) =>
+          sections.length > 1 ? (
+            <Text accessibilityRole="header" style={styles.section}>
+              {section.title}
+            </Text>
+          ) : null
+        }
         ItemSeparatorComponent={Separator}
         stickySectionHeadersEnabled={false}
         keyboardShouldPersistTaps="handled"
