@@ -422,7 +422,12 @@
     "noDevices": "Telefonul nu este încă înregistrat. Încearcă din nou imediat.",
     "wait": "Un test pe minut. Încearcă din nou puțin mai târziu.",
     "blocked": "Notificările pentru CampusPulse sunt oprite din setările Android.",
-    "failed": "Nu a funcționat. Verifică conexiunea și încearcă din nou."
+    "failed": "Nu a funcționat. Verifică conexiunea și încearcă din nou.",
+    "leadLabel": "Amintește-mi înainte de fiecare curs",
+    "leadOff": "Oprit",
+    "leadMinutes": "{{n}} min",
+    "leadAbout": "O notificare cu {{n}} minute înainte de fiecare curs.",
+    "leadOffAbout": "Fără mementouri înainte de cursuri."
   },
   "deleteAccount": {
     "about": "Ștergerea contului elimină grupa, materiile tale și acest telefon din CampusPulse.",
