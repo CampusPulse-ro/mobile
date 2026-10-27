@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
 
@@ -5,9 +6,13 @@ import { useCampusVirtual } from '@/campusVirtual/useCampusVirtual'
 import { Button, Heading, Muted } from '@/components/ui'
 import { color, radius, space } from '@/theme'
 
-/** Profile's Campus Virtual section: connect, see who is connected, reconnect, disconnect. */
+/**
+ * Profile's Campus Virtual section: connect, see who is connected, open the assignments,
+ * reconnect, disconnect.
+ */
 export function CampusVirtualCard() {
   const { t } = useTranslation()
+  const router = useRouter()
   const { state, connect, disconnect, retry } = useCampusVirtual()
 
   return (
@@ -43,6 +48,7 @@ export function CampusVirtualCard() {
               ? t('campusVirtual.connectedAs', { name: state.fullname })
               : t('campusVirtual.connected')}
           </Muted>
+          <Button label={t('assignments.title')} onPress={() => router.push('/assignments')} />
           <Button
             label={t('campusVirtual.disconnect')}
             variant="secondary"

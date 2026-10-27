@@ -7,6 +7,9 @@
  * - the word limit is enforced by Moodle, but file type, count and size are NOT through the web
  *   service (a .txt was stored in a PDF-only assignment): the app checks them before uploading;
  * - saving files replaces the whole set; saving without `files_filemanager` keeps the files;
+ * - but saving without the online text fails (`dmlwriteexception`) when the assignment has one:
+ *   Moodle saves every enabled part, and a missing text counts as an empty one. A files-only save
+ *   sends the stored text back exactly as it is (`keepTextHtml`);
  * - submitting for grading without the required statement fails; after it, `canedit` is false;
  * - `mod_assign_save_submission` and `mod_assign_submit_for_grading` answer with a list of
  *   warnings, empty on success. Warning messages are HTML, escaped.
@@ -16,6 +19,8 @@ export type AssignmentRules = {
   id: number
   cmid: number
   courseId: number
+  /** The course's full name (its short name when it has none); '' when the answer doesn't say. */
+  courseName: string
   name: string
   /** Milliseconds since the epoch, or null when not set. */
   opensAt: number | null
@@ -66,11 +71,13 @@ type RawAssignment = {
   submissionstatement?: string
   configs?: RawConfig[]
 }
+/** The course an assignment came in (`courses[]` of the same answer). */
+type RawCourse = { fullname?: string; shortname?: string }
 
 const ms = (seconds: number | undefined) => (seconds ? seconds * 1000 : null)
 
-/** One assignment from `mod_assign_get_assignments` (`courses[].assignments[]`). */
-export function parseAssignment(raw: RawAssignment): AssignmentRules | null {
+/** One assignment from `mod_assign_get_assignments` (`courses[].assignments[]`), and its course. */
+export function parseAssignment(raw: RawAssignment, course?: RawCourse): AssignmentRules | null {
   if (typeof raw.id !== 'number' || typeof raw.cmid !== 'number') return null
   const config = (plugin: string, name: string) =>
     raw.configs?.find(
@@ -82,6 +89,7 @@ export function parseAssignment(raw: RawAssignment): AssignmentRules | null {
     id: raw.id,
     cmid: raw.cmid,
     courseId: raw.course ?? 0,
+    courseName: moodleText(course?.fullname ?? '') || moodleText(course?.shortname ?? ''),
     name: moodleText(raw.name ?? ''),
     opensAt: ms(raw.allowsubmissionsfromdate),
     dueAt: ms(raw.duedate),
@@ -244,11 +252,12 @@ export function checkFiles(files: PickedFile[], rules: AssignmentRules): FilePro
  */
 export function saveSubmissionParams(
   rules: AssignmentRules,
-  input: { text?: string; textItemId?: number; filesItemId?: number },
+  input: { text?: string; keepTextHtml?: string; textItemId?: number; filesItemId?: number },
 ): Record<string, string | number> {
   const params: Record<string, string | number> = { assignmentid: rules.id }
-  if (rules.onlineText && input.text !== undefined && input.textItemId !== undefined) {
-    params['plugindata[onlinetext_editor][text]'] = textToHtml(input.text)
+  const html = input.text !== undefined ? textToHtml(input.text) : input.keepTextHtml
+  if (rules.onlineText && html !== undefined && input.textItemId !== undefined) {
+    params['plugindata[onlinetext_editor][text]'] = html
     params['plugindata[onlinetext_editor][format]'] = 1 // FORMAT_HTML
     params['plugindata[onlinetext_editor][itemid]'] = input.textItemId
   }

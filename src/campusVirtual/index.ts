@@ -263,13 +263,15 @@ async function connected<T>(work: (token: string) => Promise<T>): Promise<T> {
 /** Every assignment the student can see, in every course; null when not connected. */
 export function getAssignments(): Promise<AssignmentRules[] | null> {
   return withToken(async (token) => {
-    const answer = await callReadOnly<{ courses?: { assignments?: unknown[] }[] }>(
-      'mod_assign_get_assignments',
-      token,
-    )
+    const answer = await callReadOnly<{
+      courses?: { fullname?: string; shortname?: string; assignments?: unknown[] }[]
+    }>('mod_assign_get_assignments', token)
     return (answer.courses ?? [])
-      .flatMap((course) => course.assignments ?? [])
-      .map((raw) => parseAssignment(raw as Parameters<typeof parseAssignment>[0]))
+      .flatMap((course) =>
+        (course.assignments ?? []).map((raw) =>
+          parseAssignment(raw as Parameters<typeof parseAssignment>[0], course),
+        ),
+      )
       .filter((rules): rules is AssignmentRules => rules !== null)
   })
 }
@@ -302,8 +304,9 @@ export type SubmissionFile = PickedFile & { uri: string; mimeType: string }
 
 /**
  * Saves the student's submission: a draft when the assignment uses drafts, otherwise it's
- * submitted. `text` replaces the online text; `files`, when given, replace ALL submitted files
- * (leaving it out keeps them). The caller has confirmed it with the student.
+ * submitted. `text` replaces the online text (leaving it out keeps it: a files-only save sends the
+ * stored text back unchanged); `files`, when given, replace ALL submitted files (leaving them out
+ * keeps them). The caller has confirmed it with the student.
  *
  * Checked again here, from a fresh read, whatever the screen already checked: Moodle must allow
  * editing now (CampusVirtualNotAllowedError), and the text and files must fit the assignment's
@@ -326,8 +329,16 @@ export async function saveSubmission(
     if (input.text === undefined && input.files === undefined)
       throw new CampusVirtualInputError([{ kind: 'empty' }])
 
+    // Files without a new text: the stored text goes back unchanged (formatting and all), or Moodle
+    // refuses the save on an assignment with an online text (measured; see assign.ts).
+    const keepTextHtml =
+      input.text === undefined && input.files !== undefined && rules.onlineText
+        ? before.textHtml
+        : undefined
     const textItemId =
-      input.text !== undefined && rules.onlineText ? await draftItemId(token) : undefined
+      rules.onlineText && (input.text !== undefined || keepTextHtml !== undefined)
+        ? await draftItemId(token)
+        : undefined
     let filesItemId: number | undefined
     if (input.files !== undefined && rules.files) {
       filesItemId = await draftItemId(token)
@@ -336,7 +347,7 @@ export async function saveSubmission(
     await callWrite(
       'mod_assign_save_submission',
       token,
-      saveSubmissionParams(rules, { text: input.text, textItemId, filesItemId }),
+      saveSubmissionParams(rules, { text: input.text, keepTextHtml, textItemId, filesItemId }),
     )
     return readSubmission(token, rules.id)
   })
