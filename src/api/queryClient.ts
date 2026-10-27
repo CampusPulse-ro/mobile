@@ -33,6 +33,7 @@ if (Platform.OS !== 'web') {
  * the student could see anyway are stored, never a token. The stored copy expires after a week and
  * is dropped when the app version changes; signing out removes it (`forgetStoredCache`).
  */
+const CACHE_SHAPE = 2
 const STORED_ROOTS = new Set(['me', 'semester', 'timetable', 'rooms', 'campusVirtual'])
 
 const persister = createAsyncStoragePersister({
@@ -44,7 +45,8 @@ const persister = createAsyncStoragePersister({
 export const persistOptions: Omit<PersistQueryClientOptions, 'queryClient'> = {
   persister,
   maxAge: OFFLINE_FOR_MS,
-  buster: Constants.expoConfig?.version ?? '',
+  // Bump CACHE_SHAPE when a stored query's data changes shape, so an old copy is never read.
+  buster: `${Constants.expoConfig?.version ?? ''}:${CACHE_SHAPE}`,
   dehydrateOptions: {
     shouldDehydrateQuery: (query: Query) =>
       query.state.status === 'success' && STORED_ROOTS.has(String(query.queryKey[0])),
