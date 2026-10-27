@@ -25,7 +25,8 @@ export type Deadline = {
   cmid: number | null
   eventType: string
   /** When it's due. */
-  dueAt: Date
+  /** Milliseconds since the epoch: a number, not a Date, so the stored offline cache keeps it intact. */
+  dueAt: number
   overdue: boolean
   url: string | null
   course: { id: number; shortName: string; fullName: string } | null
@@ -115,7 +116,7 @@ function parseDeadline(value: unknown): Deadline | null {
     module: asString(event.modulename) ?? '',
     cmid: cmidFromUrl(url) ?? asNumber(event.instance),
     eventType: asString(event.eventtype) ?? '',
-    dueAt: new Date(timesort * 1000),
+    dueAt: timesort * 1000,
     overdue: event.overdue === true,
     url,
     course:
@@ -137,7 +138,7 @@ export function parseDeadlines(body: unknown): Deadline[] {
   return events
     .map(parseDeadline)
     .filter((deadline): deadline is Deadline => deadline !== null)
-    .sort((a, b) => a.dueAt.getTime() - b.dueAt.getTime())
+    .sort((a, b) => a.dueAt - b.dueAt)
 }
 
 /** The statuses of `core_completion_get_activities_completion_status`. */

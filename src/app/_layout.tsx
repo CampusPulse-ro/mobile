@@ -1,11 +1,11 @@
-import { QueryClientProvider } from '@tanstack/react-query'
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import { DarkTheme, Stack, ThemeProvider, useRouter } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect, useRef, useState } from 'react'
 
 import { ApiError } from '@/api/client'
-import { queryClient } from '@/api/queryClient'
+import { forgetStoredCache, persistOptions, queryClient } from '@/api/queryClient'
 import { loadSession, signOut, useSession } from '@/auth'
 import { loadSavedLanguage } from '@/i18n'
 import { registerForPush } from '@/push'
@@ -41,12 +41,12 @@ export default function RootLayout() {
   if (!ready) return null
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions}>
       <ThemeProvider value={theme}>
         <StatusBar style="light" />
         <Routes />
       </ThemeProvider>
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   )
 }
 
@@ -67,7 +67,10 @@ function Routes() {
 
   // Signed out: forget every cached response of the previous student.
   useEffect(() => {
-    if (status === 'signedOut') queryClient.clear()
+    if (status === 'signedOut') {
+      queryClient.clear()
+      void forgetStoredCache().catch(() => undefined)
+    }
   }, [status])
 
   // A settings request that failed (offline) still opens the tabs, which show their own errors.
