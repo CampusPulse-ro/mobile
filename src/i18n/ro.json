@@ -169,6 +169,163 @@
       "unreachable": "Campus Virtual nu răspunde. Verifică conexiunea la internet și încearcă din nou."
     }
   },
+  "assignments": {
+    "title": "Teme",
+    "about": "Din cursurile tale de pe Campus Virtual",
+    "assignment": "Temă",
+    "back": "Înapoi",
+    "cancel": "Anulează",
+    "retry": "Încearcă din nou",
+    "openAssignment": "Deschide tema",
+    "loadFailed": "Temele nu au putut fi încărcate",
+    "loadFailedAbout": "Campus Virtual nu răspunde. Verifică conexiunea la internet și încearcă din nou.",
+    "empty": "Nicio temă",
+    "emptyAbout": "Niciunul dintre cursurile tale de pe Campus Virtual nu are teme.",
+    "noUpcoming": "Nimic de predat în curând.",
+    "notConnected": "Campus Virtual nu e conectat",
+    "notConnectedAbout": "Conectează Campus Virtual din Profil ca să-ți vezi aici temele.",
+    "expired": "Conexiunea cu Campus Virtual a expirat",
+    "expiredAbout": "Reconectează Campus Virtual din Profil ca să-ți vezi aici temele.",
+    "goToProfile": "Mergi la Profil",
+    "notFound": "Tema nu a fost găsită",
+    "notFoundAbout": "Nu (mai) apare în cursurile tale de pe Campus Virtual.",
+    "past": "Trecute ({{n}})",
+    "showPast": "Arată",
+    "hidePast": "Ascunde",
+    "courseN": "Cursul {{id}}",
+    "row": {
+      "due": "Termen: {{when}}",
+      "noDueDate": "Fără termen",
+      "opens": "Se deschide: {{when}}",
+      "closed": "Închisă",
+      "cutoffPassed": "Termenul final a trecut"
+    },
+    "when": {
+      "today": "azi, {{time}}",
+      "tomorrow": "mâine, {{time}}",
+      "day": "{{day}}, {{time}}"
+    },
+    "status": {
+      "none": "Nimic trimis",
+      "draft": "Ciornă (netrimisă pentru notare)",
+      "submitted": "Trimisă pentru notare",
+      "reopened": "Redeschisă",
+      "graded": "Notată"
+    },
+    "detail": {
+      "opens": "Deschisă de la",
+      "due": "Termen",
+      "cutoff": "Data limită: după ea nu se mai poate trimite nimic",
+      "extension": "Prelungirea ta",
+      "submission": "Trimiterea ta",
+      "lastModified": "Ultima modificare: {{when}}",
+      "onlineText": "Text online",
+      "noText": "Niciun text online.",
+      "files": "Fișiere",
+      "noFiles": "Niciun fișier.",
+      "loadingSubmission": "Se încarcă trimiterea ta…",
+      "submissionFailed": "Trimiterea ta nu a putut fi încărcată din Campus Virtual.",
+      "openInCampusVirtual": "Deschide în Campus Virtual"
+    },
+    "reason": {
+      "notOpen": "Se deschide: {{when}}.",
+      "closed": "S-a închis: {{when}}.",
+      "submitted": "Trimisă pentru notare: nu mai poate fi schimbată.",
+      "locked": "Trimiterea ta e blocată: nu mai poate fi schimbată.",
+      "nothingToSubmit": "La această temă nu se trimite nimic din aplicație. Vezi-o în Campus Virtual.",
+      "notAllowed": "Campus Virtual nu te lasă să schimbi acum această trimitere."
+    },
+    "edit": {
+      "heading": "Modifică trimiterea",
+      "resubmitAbout": "Ai trimis deja tema. Până se închide o mai poți schimba: salvarea înlocuiește ce vede profesorul.",
+      "textPlaceholder": "Scrie răspunsul",
+      "words": "Cuvinte: {{n}}",
+      "wordsLimit": "Cuvinte: {{n}} / {{limit}}",
+      "chooseFiles": "Alege fișiere",
+      "sizeUnknown": "Dimensiune necunoscută",
+      "removeFile": "Elimină {{name}}",
+      "replacesOne": "Salvarea înlocuiește fișierul pe care l-ai trimis.",
+      "replacesMany": "Salvarea înlocuiește fișierele pe care le-ai trimis ({{n}}).",
+      "pickerUnavailable": "Ca să alegi fișiere ai nevoie de cea mai nouă versiune a aplicației. Actualizeaz-o sau trimite fișierele din Campus Virtual.",
+      "pickerFailed": "Selectorul de fișiere nu s-a deschis. Încearcă din nou.",
+      "saveDraft": "Salvează ciorna",
+      "saveAndSubmit": "Salvează și trimite",
+      "noChanges": "Schimbă textul sau alege fișiere ca să salvezi.",
+      "fixProblems": "Corectează ce e marcat cu roșu ca să salvezi.",
+      "acceptStatement": "Acceptă declarația de mai sus ca să trimiți.",
+      "formattedText": "Textul are formatare (îngroșat, liste, linkuri sau imagini) pe care aplicația nu o poate afișa. Dacă salvezi aici o modificare, rămân doar cuvintele.",
+      "embeddedFiles": "Textul online conține imagini, pe care o salvare din aplicație le-ar pierde. Modifică această lucrare pe Campus Virtual."
+    },
+    "limits": {
+      "one": "1 fișier",
+      "many": "Fișiere: cel mult {{n}}",
+      "size": "{{size}} fiecare",
+      "anyType": "orice tip"
+    },
+    "size": {
+      "b": "{{n}} B",
+      "kb": "{{n}} KB",
+      "mb": "{{n}} MB",
+      "gb": "{{n}} GB"
+    },
+    "statement": {
+      "label": "Accept această declarație"
+    },
+    "problem": {
+      "empty": "Nu e nimic de salvat.",
+      "statement": "Declarația nu a fost acceptată.",
+      "tooManyWords": "Prea multe cuvinte: {{words}}, cel mult {{limit}}.",
+      "tooMany": "Prea multe fișiere: cel mult {{max}}.",
+      "tooBig": "Prea mare: cel mult {{size}}.",
+      "unknownSize": "Dimensiunea nu poate fi citită, așa că nu poate fi verificată.",
+      "wrongType": "Tip neacceptat (se acceptă: {{types}}).",
+      "typesUnknown": "Această temă acceptă tipuri de fișiere pe care aplicația nu le poate verifica. Încarcă fișierele pe Campus Virtual."
+    },
+    "confirm": {
+      "draftTitle": "Salvezi ciorna?",
+      "submitTitle": "Trimiți în Campus Virtual?",
+      "changeTitle": "Schimbi ce ai trimis?",
+      "draft": "Salvezi o ciornă pentru „{{name}}” de la {{course}} în Campus Virtual? Nu e trimisă încă pentru notare.",
+      "submit": "Trimiți „{{name}}” de la {{course}} în Campus Virtual? Profesorul o va vedea.",
+      "change": "Schimbi ce ai trimis la „{{name}}” de la {{course}} în Campus Virtual? Profesorul va vedea noua variantă.",
+      "text": "Textul online e înlocuit cu cel nou (cuvinte: {{n}}).",
+      "textCleared": "Textul online e golit.",
+      "formattingLost": "Formatarea lui (îngroșat, liste, linkuri, imagini) se pierde: rămân doar cuvintele.",
+      "files": "Fișiere trimise: {{names}}.",
+      "replacesOne": "Înlocuiește fișierul pe care l-ai trimis.",
+      "replacesMany": "Înlocuiește fișierele pe care le-ai trimis ({{n}})."
+    },
+    "grading": {
+      "heading": "Trimite pentru notare",
+      "about": "Profesorul notează ciorna pe care ai salvat-o. După asta nu o mai poți schimba.",
+      "saveFirst": "Salvează întâi modificările: se trimite ciorna salvată în Campus Virtual.",
+      "acceptFirst": "Acceptă declarația de mai sus ca să trimiți.",
+      "button": "Trimite pentru notare",
+      "confirmTitle": "Trimiți pentru notare?",
+      "confirm": "Trimiți pentru notare ciorna salvată pentru „{{name}}” de la {{course}}?",
+      "continue": "Continuă",
+      "finalTitle": "Ultima verificare",
+      "final": "După asta nu o mai poți schimba. Trimiți pentru notare?"
+    },
+    "outcome": {
+      "draftSaved": "Ciorna a fost salvată în Campus Virtual. Nu e trimisă încă pentru notare.",
+      "submitted": "Trimisă în Campus Virtual.",
+      "submittedForGrading": "Trimisă pentru notare în Campus Virtual.",
+      "notRecorded": "Campus Virtual a răspuns, dar schimbarea nu apare acolo. Verifică tema în Campus Virtual.",
+      "notAllowed": "Campus Virtual nu permite acum această schimbare, așa că nu s-a trimis nimic.",
+      "input": "Nu s-a trimis. {{problems}}",
+      "failed": "Campus Virtual nu a făcut schimbarea.",
+      "failedReason": "Campus Virtual nu a făcut schimbarea: {{reason}}",
+      "rejected": "Campus Virtual a refuzat cererea: {{reason}}",
+      "expired": "Conexiunea cu Campus Virtual a expirat. Reconectează-te din Profil, apoi verifică în Campus Virtual ce s-a salvat.",
+      "unreachable": "Campus Virtual nu răspunde, așa că nu e sigur că schimbarea s-a făcut. Verifică tema în Campus Virtual înainte să încerci din nou.",
+      "notConnectedBefore": "Campus Virtual nu e conectat, așa că nu s-a trimis nimic. Conectează-l din Profil.",
+      "expiredBefore": "Conexiunea cu Campus Virtual a expirat, așa că nu s-a trimis nimic. Reconectează-te din Profil.",
+      "rejectedBefore": "Campus Virtual a refuzat cererea, așa că nu s-a trimis nimic: {{reason}}",
+      "unreachableBefore": "Campus Virtual nu răspunde, așa că nu s-a trimis nimic. Verifică conexiunea la internet și încearcă din nou."
+    },
+    "statementFallback": "Confirm că această lucrare îmi aparține."
+  },
   "language": {
     "en": "English",
     "ro": "Română"
@@ -265,7 +422,12 @@
     "noDevices": "Telefonul nu este încă înregistrat. Încearcă din nou imediat.",
     "wait": "Un test pe minut. Încearcă din nou puțin mai târziu.",
     "blocked": "Notificările pentru CampusPulse sunt oprite din setările Android.",
-    "failed": "Nu a funcționat. Verifică conexiunea și încearcă din nou."
+    "failed": "Nu a funcționat. Verifică conexiunea și încearcă din nou.",
+    "leadLabel": "Amintește-mi înainte de fiecare curs",
+    "leadOff": "Oprit",
+    "leadMinutes": "{{n}} min",
+    "leadAbout": "O notificare cu {{n}} minute înainte de fiecare curs.",
+    "leadOffAbout": "Fără mementouri înainte de cursuri."
   },
   "deleteAccount": {
     "about": "Ștergerea contului elimină grupa, materiile tale și acest telefon din CampusPulse.",

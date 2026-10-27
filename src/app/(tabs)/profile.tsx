@@ -1,14 +1,24 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 
 import { api, ApiError, unwrap } from '@/api/client'
 import { signOut } from '@/auth'
 import { CampusVirtualCard } from '@/components/CampusVirtualCard'
 import { LanguageSwitch } from '@/components/LanguageSwitch'
 import { Button, Heading, Muted, Screen, Title } from '@/components/ui'
-import { getPushPermission, registerForPush, sendTestNotification, unregisterPush } from '@/push'
+import {
+  DEFAULT_REMINDER_LEAD,
+  getPushPermission,
+  getReminderLead,
+  REMINDER_LEADS,
+  registerForPush,
+  sendTestNotification,
+  setReminderLead,
+  unregisterPush,
+  type ReminderLead,
+} from '@/push'
 import { color, radius, space } from '@/theme'
 
 export default function ProfileScreen() {
@@ -62,6 +72,7 @@ function RemindersCard() {
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const on = permission.data === 'granted'
+  const queryClient = useQueryClient()
 
   async function turnOn() {
     setBusy(true)
@@ -69,6 +80,10 @@ function RemindersCard() {
     try {
       const result = await registerForPush({ ask: true })
       if (result !== 'granted') setMessage(t('push.blocked'))
+      // Allowing notifications is what the student asked for: reminders come with it.
+      else if ((await getReminderLead()) === null) {
+        queryClient.setQueryData(REMINDERS_KEY, await setReminderLead(DEFAULT_REMINDER_LEAD))
+      }
       await permission.refetch()
     } catch {
       setMessage(t('push.failed'))
@@ -97,6 +112,7 @@ function RemindersCard() {
     <View style={styles.card}>
       <Heading>{t('push.title')}</Heading>
       <Muted>{on ? t('push.on') : t('push.about')}</Muted>
+      {on ? <ReminderLeadChoice /> : null}
       {on ? (
         <Button
           label={t('push.test')}
@@ -108,6 +124,69 @@ function RemindersCard() {
         <Button label={t('push.turnOn')} busy={busy} onPress={() => void turnOn()} />
       )}
       {message ? <Text style={styles.message}>{message}</Text> : null}
+    </View>
+  )
+}
+
+const REMINDERS_KEY = ['me', 'reminders'] as const
+
+/** How long before each class the API sends a reminder: Off, 5, 10, 15, 30 or 60 minutes. */
+function ReminderLeadChoice() {
+  const { t } = useTranslation()
+  const queryClient = useQueryClient()
+  const lead = useQuery({ queryKey: REMINDERS_KEY, queryFn: getReminderLead })
+  const [saving, setSaving] = useState<ReminderLead | 'none'>('none')
+  const [failed, setFailed] = useState(false)
+
+  async function choose(value: ReminderLead) {
+    if (saving !== 'none' || value === lead.data) return
+    setSaving(value)
+    setFailed(false)
+    try {
+      queryClient.setQueryData(REMINDERS_KEY, await setReminderLead(value))
+    } catch {
+      setFailed(true)
+    } finally {
+      setSaving('none')
+    }
+  }
+
+  const options: ReminderLead[] = [null, ...REMINDER_LEADS]
+  return (
+    <View style={styles.leadBlock}>
+      <Text style={styles.leadLabel}>{t('push.leadLabel')}</Text>
+      <View
+        accessibilityRole="radiogroup"
+        accessibilityLabel={t('push.leadLabel')}
+        style={styles.leadRow}
+      >
+        {options.map((value) => {
+          const selected = lead.data !== undefined && lead.data === value
+          const label = value === null ? t('push.leadOff') : t('push.leadMinutes', { n: value })
+          return (
+            <Pressable
+              key={String(value)}
+              accessibilityRole="radio"
+              accessibilityState={{
+                checked: selected,
+                busy: saving === value,
+                disabled: lead.isPending,
+              }}
+              disabled={lead.isPending}
+              onPress={() => void choose(value)}
+              style={[styles.leadOption, selected && styles.leadSelected]}
+            >
+              <Text style={[styles.leadText, selected && styles.leadTextSelected]}>{label}</Text>
+            </Pressable>
+          )
+        })}
+      </View>
+      <Muted>
+        {lead.data === null || lead.data === undefined
+          ? t('push.leadOffAbout')
+          : t('push.leadAbout', { n: lead.data })}
+      </Muted>
+      {failed || lead.isError ? <Text style={styles.message}>{t('push.failed')}</Text> : null}
     </View>
   )
 }
@@ -162,5 +241,22 @@ const styles = StyleSheet.create({
   },
   name: { color: color.ink, fontSize: 16, fontWeight: '600' },
   message: { color: color.ink, fontSize: 15 },
+  leadBlock: { gap: space.sm },
+  leadLabel: { color: color.ink, fontSize: 15, fontWeight: '600' },
+  leadRow: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
+  leadOption: {
+    minHeight: 44,
+    minWidth: 44,
+    paddingHorizontal: space.md,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: color.line,
+    backgroundColor: color.page,
+  },
+  leadSelected: { borderColor: color.accent },
+  leadText: { color: color.inkSoft, fontSize: 15 },
+  leadTextSelected: { color: color.ink, fontWeight: '600' },
   danger: { marginTop: space.xl, gap: space.sm },
 })

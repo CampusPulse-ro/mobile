@@ -169,6 +169,163 @@
       "unreachable": "Couldn't reach Campus Virtual. Check your internet connection and try again."
     }
   },
+  "assignments": {
+    "title": "Assignments",
+    "about": "From your Campus Virtual courses",
+    "assignment": "Assignment",
+    "back": "Back",
+    "cancel": "Cancel",
+    "retry": "Try again",
+    "openAssignment": "Open assignment",
+    "loadFailed": "Couldn't load your assignments",
+    "loadFailedAbout": "Campus Virtual didn't answer. Check your internet connection and try again.",
+    "empty": "No assignments",
+    "emptyAbout": "None of your Campus Virtual courses has an assignment.",
+    "noUpcoming": "Nothing coming up.",
+    "notConnected": "Campus Virtual isn't connected",
+    "notConnectedAbout": "Connect Campus Virtual on Profile to see your assignments here.",
+    "expired": "Your Campus Virtual connection has expired",
+    "expiredAbout": "Reconnect Campus Virtual on Profile to see your assignments here.",
+    "goToProfile": "Go to Profile",
+    "notFound": "Assignment not found",
+    "notFoundAbout": "It isn't in your Campus Virtual courses (any more).",
+    "past": "Past ({{n}})",
+    "showPast": "Show",
+    "hidePast": "Hide",
+    "courseN": "Course {{id}}",
+    "row": {
+      "due": "Due {{when}}",
+      "noDueDate": "No due date",
+      "opens": "Opens {{when}}",
+      "closed": "Closed",
+      "cutoffPassed": "Cut-off passed"
+    },
+    "when": {
+      "today": "today, {{time}}",
+      "tomorrow": "tomorrow, {{time}}",
+      "day": "{{day}}, {{time}}"
+    },
+    "status": {
+      "none": "No submission",
+      "draft": "Draft (not submitted for grading)",
+      "submitted": "Submitted for grading",
+      "reopened": "Reopened",
+      "graded": "Graded"
+    },
+    "detail": {
+      "opens": "Open from",
+      "due": "Due",
+      "cutoff": "Cut-off: nothing can be submitted after it",
+      "extension": "Your extension",
+      "submission": "Your submission",
+      "lastModified": "Last changed {{when}}",
+      "onlineText": "Online text",
+      "noText": "No online text.",
+      "files": "Files",
+      "noFiles": "No files.",
+      "loadingSubmission": "Loading your submission…",
+      "submissionFailed": "Couldn't load your submission from Campus Virtual.",
+      "openInCampusVirtual": "Open in Campus Virtual"
+    },
+    "reason": {
+      "notOpen": "Opens on {{when}}.",
+      "closed": "Closed on {{when}}.",
+      "submitted": "Submitted for grading: it can't be changed.",
+      "locked": "Your submission is locked: it can't be changed.",
+      "nothingToSubmit": "Nothing is submitted from the app for this assignment. See it on Campus Virtual.",
+      "notAllowed": "Campus Virtual doesn't let you change this submission now."
+    },
+    "edit": {
+      "heading": "Edit submission",
+      "resubmitAbout": "You already submitted this. Until it closes you can still change it: saving replaces what your teacher sees.",
+      "textPlaceholder": "Write your answer",
+      "words": "Words: {{n}}",
+      "wordsLimit": "Words: {{n}} / {{limit}}",
+      "chooseFiles": "Choose files",
+      "sizeUnknown": "Size unknown",
+      "removeFile": "Remove {{name}}",
+      "replacesOne": "Saving replaces the file you submitted.",
+      "replacesMany": "Saving replaces the {{n}} files you submitted.",
+      "pickerUnavailable": "Choosing files needs the latest version of the app. Update it, or submit the files on Campus Virtual.",
+      "pickerFailed": "The file picker didn't open. Try again.",
+      "saveDraft": "Save draft",
+      "saveAndSubmit": "Save and submit",
+      "noChanges": "Change the text or choose files to save.",
+      "fixProblems": "Fix what's marked in red to save.",
+      "acceptStatement": "Accept the statement above to submit.",
+      "formattedText": "This text has formatting (bold, lists, links or images) that the app can't show. Saving a change here keeps only the words.",
+      "embeddedFiles": "Your online text has images in it, which a save from the app would lose. Change this submission on Campus Virtual."
+    },
+    "limits": {
+      "one": "1 file",
+      "many": "Up to {{n}} files",
+      "size": "{{size}} each",
+      "anyType": "any type"
+    },
+    "size": {
+      "b": "{{n}} B",
+      "kb": "{{n}} KB",
+      "mb": "{{n}} MB",
+      "gb": "{{n}} GB"
+    },
+    "statement": {
+      "label": "I accept this statement"
+    },
+    "problem": {
+      "empty": "There's nothing to save.",
+      "statement": "The submission statement wasn't accepted.",
+      "tooManyWords": "Too many words: {{words}}, at most {{limit}}.",
+      "tooMany": "Too many files: at most {{max}}.",
+      "tooBig": "Too big: at most {{size}}.",
+      "unknownSize": "Its size can't be read, so it can't be checked against the limit.",
+      "wrongType": "Not an accepted type (accepted: {{types}}).",
+      "typesUnknown": "This assignment accepts file types the app can't check. Submit files on Campus Virtual."
+    },
+    "confirm": {
+      "draftTitle": "Save draft?",
+      "submitTitle": "Submit to Campus Virtual?",
+      "changeTitle": "Change your submission?",
+      "draft": "Save a draft of “{{name}}” in {{course}} on Campus Virtual? It won't be submitted for grading yet.",
+      "submit": "Submit “{{name}}” in {{course}} to Campus Virtual? Your teacher will see it.",
+      "change": "Change what you submitted for “{{name}}” in {{course}} on Campus Virtual? Your teacher will see the new version.",
+      "text": "Your online text is replaced with the new one (words: {{n}}).",
+      "textCleared": "Your online text is emptied.",
+      "formattingLost": "Its formatting (bold, lists, links, images) is lost: only the words are kept.",
+      "files": "Files sent: {{names}}.",
+      "replacesOne": "This replaces the file you submitted.",
+      "replacesMany": "This replaces the {{n}} files you submitted."
+    },
+    "grading": {
+      "heading": "Submit for grading",
+      "about": "Your teacher grades the draft you saved. After this you can't change it.",
+      "saveFirst": "Save your changes first: what's submitted is the draft saved on Campus Virtual.",
+      "acceptFirst": "Accept the statement above to submit.",
+      "button": "Submit for grading",
+      "confirmTitle": "Submit for grading?",
+      "confirm": "Submit your saved draft of “{{name}}” in {{course}} for grading?",
+      "continue": "Continue",
+      "finalTitle": "Last check",
+      "final": "You won't be able to change it after this. Submit for grading?"
+    },
+    "outcome": {
+      "draftSaved": "Draft saved on Campus Virtual. It isn't submitted for grading yet.",
+      "submitted": "Submitted on Campus Virtual.",
+      "submittedForGrading": "Submitted for grading on Campus Virtual.",
+      "notRecorded": "Campus Virtual answered, but the change doesn't show there. Check the assignment on Campus Virtual.",
+      "notAllowed": "Campus Virtual doesn't allow this change now, so nothing was sent.",
+      "input": "Not sent. {{problems}}",
+      "failed": "Campus Virtual didn't make the change.",
+      "failedReason": "Campus Virtual didn't make the change: {{reason}}",
+      "rejected": "Campus Virtual turned the request down: {{reason}}",
+      "expired": "Your Campus Virtual connection has expired. Reconnect it on Profile, then check on Campus Virtual what was saved.",
+      "unreachable": "Couldn't reach Campus Virtual, so it isn't certain the change was made. Check the assignment on Campus Virtual before trying again.",
+      "notConnectedBefore": "Campus Virtual isn't connected, so nothing was sent. Connect it on Profile.",
+      "expiredBefore": "Your Campus Virtual connection has expired, so nothing was sent. Reconnect it on Profile.",
+      "rejectedBefore": "Campus Virtual turned the request down, so nothing was sent: {{reason}}",
+      "unreachableBefore": "Couldn't reach Campus Virtual, so nothing was sent. Check your internet connection and try again."
+    },
+    "statementFallback": "I confirm this submission is my own work."
+  },
   "language": {
     "en": "English",
     "ro": "Română"
@@ -265,7 +422,12 @@
     "noDevices": "This phone isn't registered yet. Try again in a moment.",
     "wait": "One test a minute. Try again shortly.",
     "blocked": "Notifications are off for CampusPulse in Android's settings.",
-    "failed": "That didn't work. Check your connection and try again."
+    "failed": "That didn't work. Check your connection and try again.",
+    "leadLabel": "Remind me before each class",
+    "leadOff": "Off",
+    "leadMinutes": "{{n}} min",
+    "leadAbout": "A notification {{n}} minutes before each of your classes.",
+    "leadOffAbout": "No reminders before classes."
   },
   "deleteAccount": {
     "about": "Deleting your account removes your group, your subjects and this phone from CampusPulse.",

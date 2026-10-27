@@ -20,10 +20,26 @@ import {
   type Deadline,
 } from './activities'
 import {
+  allowedActions,
+  checkFiles,
+  checkText,
+  hasEmbeddedFiles,
+  parseAssignment,
+  parseSubmissionStatus,
+  saveSubmissionParams,
+  submitForGradingParams,
+  type AssignmentRules,
+  type PickedFile,
+  type SubmissionState,
+} from './assign'
+import {
   callReadOnly,
   callWrite,
+  CampusVirtualError,
   CampusVirtualExpiredError,
+  CampusVirtualInputError,
   CampusVirtualNotAllowedError,
+  uploadDraftFile,
 } from './client'
 import { checkRedirect, launchUrl, newPassport, REDIRECT_PREFIX } from './redirect'
 
@@ -35,8 +51,24 @@ export {
   type Deadline,
 } from './activities'
 export {
+  allowedActions,
+  checkFiles,
+  checkText,
+  countWords,
+  hasEmbeddedFiles,
+  moodleText,
+  type AssignmentRules,
+  type FileProblem,
+  type NotEditable,
+  type PickedFile,
+  type SubmissionState,
+  type SubmissionStatus,
+  type TextProblem,
+} from './assign'
+export {
   CampusVirtualError,
   CampusVirtualExpiredError,
+  CampusVirtualInputError,
   CampusVirtualNotAllowedError,
   CampusVirtualWriteError,
 } from './client'
@@ -220,4 +252,141 @@ export async function disconnect(): Promise<void> {
   } catch {
     // Nothing stored, or the store is unavailable: either way nothing is kept.
   }
+}
+
+// --- assignments ---
+
+/** `withToken` for a write: not connected is an error here, not an empty answer. */
+async function connected<T>(work: (token: string) => Promise<T>): Promise<T> {
+  const result = await withToken(work)
+  if (result === null) throw new CampusVirtualExpiredError()
+  return result
+}
+
+/** Every assignment the student can see, in every course; null when not connected. */
+export function getAssignments(): Promise<AssignmentRules[] | null> {
+  return withToken(async (token) => {
+    const answer = await callReadOnly<{
+      courses?: { fullname?: string; shortname?: string; assignments?: unknown[] }[]
+    }>('mod_assign_get_assignments', token)
+    return (answer.courses ?? [])
+      .flatMap((course) =>
+        (course.assignments ?? []).map((raw) =>
+          parseAssignment(raw as Parameters<typeof parseAssignment>[0], course),
+        ),
+      )
+      .filter((rules): rules is AssignmentRules => rules !== null)
+  })
+}
+
+async function readSubmission(token: string, assignmentId: number): Promise<SubmissionState> {
+  return parseSubmissionStatus(
+    await callReadOnly<Parameters<typeof parseSubmissionStatus>[0]>(
+      'mod_assign_get_submission_status',
+      token,
+      { assignid: assignmentId },
+    ),
+  )
+}
+
+/** The student's own submission for an assignment; null when not connected. */
+export function getSubmission(assignmentId: number): Promise<SubmissionState | null> {
+  return withToken((token) => readSubmission(token, assignmentId))
+}
+
+async function draftItemId(token: string): Promise<number> {
+  const answer = await callReadOnly<{ itemid?: number }>(
+    'core_files_get_unused_draft_itemid',
+    token,
+  )
+  // An unexpected answer, not an expired token: never disconnect over it.
+  if (typeof answer.itemid !== 'number') throw new CampusVirtualError('rejected', 'no_draft_itemid')
+  return answer.itemid
+}
+
+export type SubmissionFile = PickedFile & { uri: string; mimeType: string }
+
+/**
+ * Saves the student's submission: a draft when the assignment uses drafts, otherwise it's
+ * submitted. `text` replaces the online text (leaving it out keeps it: a files-only save sends the
+ * stored text back unchanged); `files`, when given, replace ALL submitted files (leaving them out
+ * keeps them). The caller has confirmed it with the student.
+ *
+ * Checked again here, from a fresh read, whatever the screen already checked: Moodle must allow
+ * editing now (CampusVirtualNotAllowedError), and the text and files must fit the assignment's
+ * limits (CampusVirtualInputError) — file type, count and size are not checked by Moodle's web
+ * service at all. Then the files go to a private draft area, the save is sent, Moodle's warnings
+ * are errors, and the submission is read again and returned.
+ */
+export async function saveSubmission(
+  rules: AssignmentRules,
+  input: { text?: string; files?: SubmissionFile[]; acceptStatement?: boolean },
+): Promise<SubmissionState> {
+  return connected(async (token) => {
+    const before = await readSubmission(token, rules.id)
+    if (!allowedActions(rules, before, Date.now()).edit) throw new CampusVirtualNotAllowedError()
+    // Images embedded in the text would be lost by any save from here (see hasEmbeddedFiles).
+    if (rules.onlineText && hasEmbeddedFiles(before.textHtml)) {
+      throw new CampusVirtualInputError([{ kind: 'embeddedFiles' }])
+    }
+    // Without drafts a save submits, and Moodle's web service doesn't ask for the statement.
+    if (!rules.drafts && rules.statement !== null && input.acceptStatement !== true) {
+      throw new CampusVirtualInputError([{ kind: 'statement' }])
+    }
+    const problems = [
+      ...(input.text !== undefined ? [checkText(input.text, rules)].filter((p) => p !== null) : []),
+      ...(input.files !== undefined ? checkFiles(input.files, rules) : []),
+    ]
+    if (problems.length > 0) throw new CampusVirtualInputError(problems)
+    if (input.text === undefined && input.files === undefined)
+      throw new CampusVirtualInputError([{ kind: 'empty' }])
+
+    // Files without a new text: the stored text goes back unchanged (formatting and all), or Moodle
+    // refuses the save on an assignment with an online text (measured; see assign.ts).
+    const keepTextHtml =
+      input.text === undefined && input.files !== undefined && rules.onlineText
+        ? before.textHtml
+        : undefined
+    const textItemId =
+      rules.onlineText && (input.text !== undefined || keepTextHtml !== undefined)
+        ? await draftItemId(token)
+        : undefined
+    let filesItemId: number | undefined
+    if (input.files !== undefined && rules.files) {
+      filesItemId = await draftItemId(token)
+      for (const file of input.files) await uploadDraftFile(token, filesItemId, file)
+    }
+    await callWrite(
+      'mod_assign_save_submission',
+      token,
+      saveSubmissionParams(rules, { text: input.text, keepTextHtml, textItemId, filesItemId }),
+    )
+    return readSubmission(token, rules.id)
+  })
+}
+
+/**
+ * Submits the saved draft for grading: after this the student can't change it. The caller has
+ * confirmed it twice. Checked again from a fresh read that Moodle offers it, and that the
+ * statement was accepted when the assignment requires one.
+ */
+export async function submitForGrading(
+  rules: AssignmentRules,
+  acceptStatement: boolean,
+): Promise<SubmissionState> {
+  return connected(async (token) => {
+    const before = await readSubmission(token, rules.id)
+    if (!allowedActions(rules, before, Date.now()).submitForGrading) {
+      throw new CampusVirtualNotAllowedError()
+    }
+    if (rules.statement !== null && !acceptStatement) {
+      throw new CampusVirtualInputError([{ kind: 'statement' }])
+    }
+    await callWrite(
+      'mod_assign_submit_for_grading',
+      token,
+      submitForGradingParams(rules, acceptStatement),
+    )
+    return readSubmission(token, rules.id)
+  })
 }
