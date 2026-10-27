@@ -46,6 +46,13 @@
         "projectId": "f09d721b-fe8d-48ed-aa43-a412d10561ba"
       }
     },
-    "owner": "thorsp"
+    "owner": "thorsp",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/f09d721b-fe8d-48ed-aa43-a412d10561ba",
+      "fallbackToCacheTimeout": 5000
+    }
   }
 }

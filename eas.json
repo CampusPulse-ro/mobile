@@ -18,14 +18,16 @@
       "distribution": "internal",
       "env": {
         "EXPO_PUBLIC_API_BASE": "https://campuspulse-api-stage.thorsp.net"
-      }
+      },
+      "channel": "preview"
     },
     "production": {
       "distribution": "store",
       "autoIncrement": true,
       "env": {
         "EXPO_PUBLIC_API_BASE": "https://campuspulse-api.thorsp.net"
-      }
+      },
+      "channel": "production"
     }
   },
   "submit": {
