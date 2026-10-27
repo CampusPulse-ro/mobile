@@ -1,8 +1,8 @@
 import { QueryClientProvider } from '@tanstack/react-query'
-import { DarkTheme, Stack, ThemeProvider } from 'expo-router'
+import { DarkTheme, Stack, ThemeProvider, useRouter } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { ApiError } from '@/api/client'
 import { queryClient } from '@/api/queryClient'
@@ -69,14 +69,42 @@ function Routes() {
     if (status === 'signedOut') queryClient.clear()
   }, [status])
 
-  const known = status === 'signedOut' || (signedIn && !settings.isPending)
-  useEffect(() => {
-    if (known) void SplashScreen.hideAsync()
-  }, [known])
-  if (!known) return null
-
   // A settings request that failed (offline) still opens the tabs, which show their own errors.
   const needsSetup = signedIn && settings.isSuccess && !settings.data.studyGroup
+  const phase =
+    status === 'loading' || (signedIn && settings.isPending)
+      ? 'loading'
+      : !signedIn
+        ? 'signedOut'
+        : needsSetup
+          ? 'setup'
+          : 'app'
+
+  // The splash covers only the first answer; later loading (right after sign-in) keeps the
+  // navigator mounted, so its state isn't thrown away.
+  const [started, setStarted] = useState(false)
+  useEffect(() => {
+    if (phase !== 'loading' && !started) {
+      setStarted(true)
+      void SplashScreen.hideAsync()
+    }
+  }, [phase, started])
+
+  // Move to the screen the new phase belongs on: the guards alone leave a screen that just became
+  // unavailable (sign-in, right after signing in) on the "unmatched route" page. The first
+  // answer at launch keeps the URL the app opened with (Profile after a Campus Virtual link).
+  const router = useRouter()
+  const previous = useRef<string>('loading')
+  useEffect(() => {
+    if (phase === 'loading' || phase === previous.current) return
+    const first = previous.current === 'loading' && !started
+    previous.current = phase
+    if (phase === 'signedOut') router.replace('/sign-in')
+    else if (phase === 'setup') router.replace('/setup')
+    else if (!first) router.replace('/')
+  }, [phase, router, started])
+
+  if (!started && phase === 'loading') return null
 
   return (
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: color.page } }}>
