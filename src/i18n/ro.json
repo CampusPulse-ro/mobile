@@ -163,5 +163,27 @@
   "states": {
     "loadFailed": "Nu s-a putut încărca",
     "refreshFailed": "Nu s-a putut actualiza: se arată datele încărcate mai devreme."
+  },
+  "push": {
+    "title": "Notificări pentru cursuri",
+    "about": "Primești o notificare înainte de cursuri. Permite notificările ca să le activezi.",
+    "on": "Notificările sunt active pe acest telefon.",
+    "turnOn": "Activează notificările",
+    "test": "Trimite-mi o notificare de test",
+    "testSent": "Trimisă: ar trebui să ajungă în câteva secunde.",
+    "noDevices": "Telefonul nu este încă înregistrat. Încearcă din nou imediat.",
+    "wait": "Un test pe minut. Încearcă din nou puțin mai târziu.",
+    "blocked": "Notificările pentru CampusPulse sunt oprite din setările Android.",
+    "failed": "Nu a funcționat. Verifică conexiunea și încearcă din nou."
+  },
+  "deleteAccount": {
+    "about": "Ștergerea contului elimină grupa, materiile tale și acest telefon din CampusPulse.",
+    "button": "Șterge contul",
+    "title": "Ștergi contul?",
+    "confirm": "Grupa, materiile opționale și dispozitivele tale sunt șterse. Acțiunea nu poate fi anulată.",
+    "cancel": "Anulează",
+    "delete": "Șterge",
+    "failedTitle": "Contul nu a fost șters",
+    "failed": "Contul nu a fost șters. Verifică conexiunea și încearcă din nou."
   }
 }

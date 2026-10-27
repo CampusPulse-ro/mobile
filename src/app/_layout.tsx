@@ -8,6 +8,7 @@ import { ApiError } from '@/api/client'
 import { queryClient } from '@/api/queryClient'
 import { loadSession, signOut, useSession } from '@/auth'
 import { loadSavedLanguage } from '@/i18n'
+import { registerForPush } from '@/push'
 import { useSettings } from '@/timetable'
 import { color } from '@/theme'
 
@@ -103,6 +104,11 @@ function Routes() {
     else if (phase === 'setup') router.replace('/setup')
     else if (!first) router.replace('/')
   }, [phase, router, started])
+
+  // Keep this phone's push token fresh at our API on every launch, once notifications are allowed.
+  useEffect(() => {
+    if (phase === 'app') void registerForPush({ ask: false }).catch(() => undefined)
+  }, [phase])
 
   if (!started && phase === 'loading') return null
 

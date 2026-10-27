@@ -163,5 +163,27 @@
   "states": {
     "loadFailed": "Couldn't load this",
     "refreshFailed": "Couldn't refresh: showing what was loaded earlier."
+  },
+  "push": {
+    "title": "Class reminders",
+    "about": "Get a notification before your classes. Allow notifications to turn them on.",
+    "on": "Notifications are on for this phone.",
+    "turnOn": "Turn on reminders",
+    "test": "Send me a test notification",
+    "testSent": "Sent: it should arrive in a few seconds.",
+    "noDevices": "This phone isn't registered yet. Try again in a moment.",
+    "wait": "One test a minute. Try again shortly.",
+    "blocked": "Notifications are off for CampusPulse in Android's settings.",
+    "failed": "That didn't work. Check your connection and try again."
+  },
+  "deleteAccount": {
+    "about": "Deleting your account removes your group, your subjects and this phone from CampusPulse.",
+    "button": "Delete account",
+    "title": "Delete your account?",
+    "confirm": "Your group, your optional subjects and your devices are deleted. This can't be undone.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "failedTitle": "Not deleted",
+    "failed": "Your account wasn't deleted. Check your connection and try again."
   }
 }
