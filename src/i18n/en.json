@@ -422,7 +422,12 @@
     "noDevices": "This phone isn't registered yet. Try again in a moment.",
     "wait": "One test a minute. Try again shortly.",
     "blocked": "Notifications are off for CampusPulse in Android's settings.",
-    "failed": "That didn't work. Check your connection and try again."
+    "failed": "That didn't work. Check your connection and try again.",
+    "leadLabel": "Remind me before each class",
+    "leadOff": "Off",
+    "leadMinutes": "{{n}} min",
+    "leadAbout": "A notification {{n}} minutes before each of your classes.",
+    "leadOffAbout": "No reminders before classes."
   },
   "deleteAccount": {
     "about": "Deleting your account removes your group, your subjects and this phone from CampusPulse.",

@@ -71,3 +71,31 @@ export async function unregisterPush(): Promise<void> {
 export async function sendTestNotification(): Promise<number> {
   return unwrap(await api.POST('/me/notifications/test')).sent
 }
+
+// --- class reminders (the API sends them: GET/PUT /me/reminders) ---
+
+/** The lead times the API accepts, in minutes; null is off. */
+export const REMINDER_LEADS = [5, 10, 15, 30, 60] as const
+export type ReminderLead = (typeof REMINDER_LEADS)[number] | null
+
+/** The lead a student gets when they first allow notifications. */
+export const DEFAULT_REMINDER_LEAD: ReminderLead = 15
+
+export async function getReminderLead(): Promise<ReminderLead> {
+  const { minutesBefore } = unwrap(await api.GET('/me/reminders'))
+  return (REMINDER_LEADS as readonly number[]).includes(minutesBefore ?? -1)
+    ? (minutesBefore as ReminderLead)
+    : null
+}
+
+export async function setReminderLead(lead: ReminderLead): Promise<ReminderLead> {
+  const { minutesBefore } = unwrap(
+    await api.PUT('/me/reminders', { body: { minutesBefore: lead } }),
+  )
+  return (minutesBefore ?? null) as ReminderLead
+}
+
+/** Whether a tapped notification is a class reminder (its data says so). */
+export function isClassReminder(response: Notifications.NotificationResponse | null): boolean {
+  return response?.notification.request.content.data?.type === 'classReminder'
+}

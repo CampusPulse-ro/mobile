@@ -1,5 +1,6 @@
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import { DarkTheme, Stack, ThemeProvider, useRouter } from 'expo-router'
+import * as Notifications from 'expo-notifications'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect, useRef, useState } from 'react'
@@ -8,7 +9,7 @@ import { ApiError } from '@/api/client'
 import { forgetStoredCache, persistOptions, queryClient } from '@/api/queryClient'
 import { loadSession, signOut, useSession } from '@/auth'
 import { loadSavedLanguage } from '@/i18n'
-import { registerForPush } from '@/push'
+import { isClassReminder, registerForPush } from '@/push'
 import { useSettings } from '@/timetable'
 import { color } from '@/theme'
 
@@ -106,6 +107,17 @@ function Routes() {
     if (phase === 'signedOut') router.replace('/sign-in')
     else if (phase === 'setup') router.replace('/setup')
     else if (!first) router.replace('/')
+  }, [phase, router])
+
+  // A tapped class reminder opens Today (also when it started the app).
+  useEffect(() => {
+    if (phase !== 'app') return
+    const open = (response: Notifications.NotificationResponse | null) => {
+      if (isClassReminder(response)) router.replace('/')
+    }
+    void Notifications.getLastNotificationResponseAsync().then(open, () => undefined)
+    const subscription = Notifications.addNotificationResponseReceivedListener(open)
+    return () => subscription.remove()
   }, [phase, router])
 
   // Keep this phone's push token fresh at our API on every launch, once notifications are allowed.
