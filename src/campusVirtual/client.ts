@@ -18,17 +18,24 @@
  * - anything that changes the account, password, profile, preferences or privacy data;
  * - any `*_view_*` function: they look harmless but record views and activity completion.
  */
+import { moodleText } from './assign'
 import { SITE_URL } from './redirect'
 
 export const READ_ONLY_FUNCTIONS = [
   'core_webservice_get_site_info',
   'core_calendar_get_action_events_by_timesort',
   'core_completion_get_activities_completion_status',
+  'mod_assign_get_assignments',
+  'mod_assign_get_submission_status',
+  // Reserves an empty draft area id for an upload or an online text; stores nothing.
+  'core_files_get_unused_draft_itemid',
 ] as const
 export type ReadOnlyFunction = (typeof READ_ONLY_FUNCTIONS)[number]
 
 export const WRITE_FUNCTIONS = [
   'core_completion_update_activity_completion_status_manually',
+  'mod_assign_save_submission',
+  'mod_assign_submit_for_grading',
 ] as const
 export type WriteFunction = (typeof WRITE_FUNCTIONS)[number]
 
@@ -66,6 +73,14 @@ export class CampusVirtualError extends Error {
 }
 
 /** A write Moodle answered but did not carry out: `status: false`, or warnings (their messages). */
+/** What the student wants to send breaks the activity's rules (checked before any call). */
+export class CampusVirtualInputError extends Error {
+  constructor(public readonly problems: readonly { kind: string }[]) {
+    super(`Input not accepted: ${problems.map((p) => p.kind).join(', ')}`)
+    this.name = 'CampusVirtualInputError'
+  }
+}
+
 export class CampusVirtualWriteError extends Error {
   constructor(public readonly reasons: string[]) {
     super(reasons.join(' ') || 'Campus Virtual did not make the change')
@@ -146,7 +161,15 @@ export async function callReadOnly<T>(
   return (await call(fn, token, params)) as T
 }
 
-type WriteWarning = { message?: unknown; warningcode?: unknown }
+type WriteWarning = { item?: unknown; message?: unknown; warningcode?: unknown }
+
+/** A warning as text for the student: Moodle's `item` holds the reason (escaped HTML), `message` a summary. */
+function warningText(warning: WriteWarning): string {
+  const item = typeof warning.item === 'string' ? moodleText(warning.item) : ''
+  const message = typeof warning.message === 'string' ? moodleText(warning.message) : ''
+  // `item` is sometimes just "User id: 3, Assignment id: 1 Notices:"; prefer the message then.
+  return item && !/^User id: /.test(item) ? item : message || String(warning.warningcode ?? '')
+}
 
 /**
  * Changes something on Campus Virtual. Only from an explicit action of the student, after a
@@ -165,14 +188,56 @@ export async function callWrite<T extends { status?: boolean }>(
   assertAllowed(fn, WRITE_FUNCTIONS, 'write')
   const body = await call(fn, token, params)
   if (body === null || typeof body !== 'object') throw new CampusVirtualWriteError([])
+  // Some write functions (mod_assign_save_submission, _submit_for_grading) answer with a bare list
+  // of warnings: empty means success. The others answer `{status, warnings}`.
+  if (Array.isArray(body)) {
+    if (body.length > 0)
+      throw new CampusVirtualWriteError((body as WriteWarning[]).map(warningText))
+    return {} as T
+  }
   const result = body as T & { warnings?: WriteWarning[] }
   const warnings = Array.isArray(result.warnings) ? result.warnings : []
   if (result.status === false || warnings.length > 0) {
-    throw new CampusVirtualWriteError(
-      warnings.map((warning) =>
-        typeof warning.message === 'string' ? warning.message : String(warning.warningcode ?? ''),
-      ),
-    )
+    throw new CampusVirtualWriteError(warnings.map(warningText))
   }
   return result
+}
+
+export type UploadFile = { uri: string; name: string; mimeType: string }
+
+/**
+ * Uploads one file into the student's private draft area `itemid` (`/webservice/upload.php`).
+ * Nothing is submitted: a draft area becomes a submission only through `mod_assign_save_submission`.
+ * The caller has already checked the file against the assignment's type and size limits.
+ */
+export async function uploadDraftFile(
+  token: string,
+  itemid: number,
+  file: UploadFile,
+): Promise<void> {
+  const form = new FormData()
+  form.append('token', token)
+  form.append('filearea', 'draft')
+  form.append('itemid', String(itemid))
+  // React Native's FormData sends a local file from { uri, name, type }.
+  form.append('file_1', { uri: file.uri, name: file.name, type: file.mimeType } as unknown as Blob)
+  let response: Response
+  try {
+    response = await fetch(`${SITE_URL}/webservice/upload.php`, { method: 'POST', body: form })
+  } catch {
+    throw new CampusVirtualError('unreachable', 'network')
+  }
+  if (!response.ok) throw new CampusVirtualError('unreachable', `http_${response.status}`)
+  const body: unknown = await response.json().catch(() => null)
+  if (body !== null && typeof body === 'object' && 'errorcode' in body) {
+    const error = body as { errorcode: unknown; error?: unknown }
+    const code = String(error.errorcode)
+    if (EXPIRED_CODES.has(code)) throw new CampusVirtualExpiredError()
+    throw new CampusVirtualError(
+      'rejected',
+      code,
+      typeof error.error === 'string' ? error.error : undefined,
+    )
+  }
+  if (!Array.isArray(body) || body.length === 0) throw new CampusVirtualWriteError([])
 }
