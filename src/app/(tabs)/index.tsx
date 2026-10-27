@@ -3,8 +3,10 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native'
 
+import type { Deadline } from '@/campusVirtual'
 import { EmptyState, ErrorState, LoadingState, Pill } from '@/components/States'
 import { Button, Screen, Title } from '@/components/ui'
+import { DeadlineSheet, DueSoon, useDeadlines } from '@/deadlines'
 import { useDateTimeFormat } from '@/i18n/format'
 import { color, radius, space, type } from '@/theme'
 import {
@@ -27,7 +29,10 @@ import {
   type Occurrence,
 } from '@/timetable'
 
-/** Today's classes in time order, the one going on now highlighted, or why there are none. */
+/**
+ * Today's classes in time order, the one going on now highlighted, or why there are none; below
+ * them the Campus Virtual deadlines due soon.
+ */
 export default function TodayScreen() {
   const { t } = useTranslation()
   const router = useRouter()
@@ -45,7 +50,10 @@ export default function TodayScreen() {
   const upcoming = useMyTimetable(addDays(today, 1), addDays(today, 14), {
     enabled: hasGroup && noClasses,
   })
+  // Campus Virtual, straight from Moodle: its own states, never in the way of the classes.
+  const deadlines = useDeadlines()
   const [selected, setSelected] = useState<Occurrence | null>(null)
+  const [selectedDeadline, setSelectedDeadline] = useState<Deadline | null>(null)
   const [refreshing, setRefreshing] = useState(false)
 
   const day = campusNoon(today)
@@ -78,7 +86,12 @@ export default function TodayScreen() {
 
   const refresh = async () => {
     setRefreshing(true)
-    await Promise.all([settings.refetch(), semester.refetch(), hasGroup && timetable.refetch()])
+    await Promise.all([
+      settings.refetch(),
+      semester.refetch(),
+      hasGroup && timetable.refetch(),
+      deadlines.refetch(),
+    ])
     setRefreshing(false)
   }
 
@@ -174,6 +187,8 @@ export default function TodayScreen() {
 
         {body}
 
+        <DueSoon deadlines={deadlines} today={today} onOpen={setSelectedDeadline} />
+
         {notes.length > 0 ? (
           <View style={styles.notes}>
             <Text style={styles.notesHeading}>{t('today.notes')}</Text>
@@ -186,6 +201,7 @@ export default function TodayScreen() {
         ) : null}
       </ScrollView>
       <ClassSheet occurrence={selected} onClose={() => setSelected(null)} />
+      <DeadlineSheet deadline={selectedDeadline} onClose={() => setSelectedDeadline(null)} />
     </Screen>
   )
 }

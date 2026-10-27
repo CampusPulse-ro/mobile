@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect, useState } from 'react'
 
 import {
@@ -32,7 +33,13 @@ function fromError(error: unknown): CampusVirtualState {
 
 /** The Campus Virtual connection as a screen needs it: loading, error, empty and data. */
 export function useCampusVirtual() {
+  const queryClient = useQueryClient()
   const [state, setState] = useState<CampusVirtualState>({ status: 'loading' })
+  // Deadlines and completion belong to the account: drop them when it changes.
+  const forgetData = useCallback(
+    () => void queryClient.resetQueries({ queryKey: ['campusVirtual'] }),
+    [queryClient],
+  )
 
   // The stored connection, read once when the screen mounts (the state starts as 'loading').
   useEffect(() => {
@@ -67,18 +74,21 @@ export function useCampusVirtual() {
     setState({ status: 'connecting' })
     try {
       const outcome = await connectAccount()
-      if (outcome.kind === 'connected') setState(fromInfo(outcome.info))
-      else if (outcome.kind === 'refused') setState({ status: 'error', problem: 'refused' })
+      if (outcome.kind === 'connected') {
+        setState(fromInfo(outcome.info))
+        forgetData()
+      } else if (outcome.kind === 'refused') setState({ status: 'error', problem: 'refused' })
       else await reload() // cancelled: show whatever is stored (maybe still connected)
     } catch (error) {
       setState(fromError(error))
     }
-  }, [reload])
+  }, [reload, forgetData])
 
   const disconnect = useCallback(async () => {
     await disconnectAccount()
     setState({ status: 'disconnected' })
-  }, [])
+    forgetData()
+  }, [forgetData])
 
   return { state, connect, disconnect, retry }
 }
