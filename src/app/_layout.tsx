@@ -83,11 +83,12 @@ function Routes() {
       <Stack.Protected guard={!signedIn}>
         <Stack.Screen name="sign-in" />
       </Stack.Protected>
-      <Stack.Protected guard={needsSetup}>
-        <Stack.Screen name="setup" />
-      </Stack.Protected>
       <Stack.Protected guard={signedIn && !needsSetup}>
         <Stack.Screen name="(tabs)" />
+      </Stack.Protected>
+      {/* Open whenever signed in, so "Pick my group again" can come back to it. */}
+      <Stack.Protected guard={signedIn}>
+        <Stack.Screen name="setup" />
       </Stack.Protected>
     </Stack>
   )
