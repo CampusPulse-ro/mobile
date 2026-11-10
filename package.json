@@ -29,7 +29,7 @@
     "expo-system-ui": "~57.0.4",
     "expo-updates": "~57.0.26",
     "expo-web-browser": "~57.0.3",
-    "i18next": "^26.5.12",
+    "i18next": "^27.0.1",
     "openapi-fetch": "0.17.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
