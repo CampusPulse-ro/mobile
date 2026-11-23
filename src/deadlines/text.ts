@@ -36,7 +36,7 @@ export function useDeadlineText() {
         ? t(MODULE_KEYS[deadline.module])
         : t('deadlines.module.other'),
     /** "Today, 23:59", "Tomorrow, 23:59", "Fri 30 October, 23:59" (campus time) */
-    due: (deadline: Deadline, today: string) => {
+    due: (deadline: { dueAt: number }, today: string) => {
       const day = campusToday(new Date(deadline.dueAt))
       const time = format.time(deadline.dueAt)
       if (day === today) return t('deadlines.dueToday', { time })

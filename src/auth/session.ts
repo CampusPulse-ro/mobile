@@ -1,37 +1,36 @@
 /**
- * The signed-in student: Microsoft tokens for our API and the session state screens read.
+ * The signed-in student: our session tokens (`tokens.ts`) wired to the phone, and the state screens
+ * read.
  *
- * - The refresh token is kept in SecureStore (the Keychain / Android Keystore), split into chunks
- *   because SecureStore values over 2 KB may be refused. The access token lives in memory only.
- * - `signIn()` is the interactive sign-in. Only it calls `POST /me` (the API's rule: never on app
- *   start or after a silent refresh, so a phone that still holds tokens can't re-create an account
- *   the student deleted elsewhere).
- * - `getAccessToken()` refreshes silently when the token is about to expire; a refresh Microsoft
- *   refuses signs the student out.
+ * - Our refresh token is in SecureStore (this device only, never in a backup); the access token in
+ *   memory. `getAccessToken()` refreshes it when needed; a refresh the API refuses signs out.
+ * - **Phones signed in by app 0.1.3** hold a Microsoft refresh token instead (`legacy.ts`). The
+ *   first time a token is needed, it is exchanged once: Microsoft gives a fresh Entra access token,
+ *   `POST /auth/microsoft` gives our tokens, and the Microsoft one is deleted. That call never
+ *   brings back an account the student deleted elsewhere: when it answers `isNew`, the account it
+ *   just made is deleted again and the student is signed out.
+ * - Signing in happens in `signIn.ts`, which hands the tokens to `beginSession`.
  */
-import {
-  AuthRequest,
-  exchangeCodeAsync,
-  Prompt,
-  refreshAsync,
-  type TokenResponse,
-} from 'expo-auth-session'
 import * as SecureStore from 'expo-secure-store'
-import * as WebBrowser from 'expo-web-browser'
 import { useSyncExternalStore } from 'react'
 
+import { plainApi, unwrap } from '@/api/http'
 import { disconnect as disconnectCampusVirtual } from '@/campusVirtual'
 
-import { CLIENT_ID, discovery, REDIRECT_URI, SCOPES } from './config'
-
-WebBrowser.maybeCompleteAuthSession()
+import {
+  clearMicrosoftRefreshToken,
+  readMicrosoftRefreshToken,
+  saveMicrosoftRefreshToken,
+} from './legacy'
+import { isRefusedByMicrosoft, refreshMicrosoft } from './microsoft'
+import { createTokenKeeper, type Recovered, type TokenResponse } from './tokens'
 
 export type SessionStatus = 'loading' | 'signedOut' | 'signedIn'
+export type SignOutNotice = 'accountGone' | 'expired' | null
 
-type State = { status: SessionStatus; notice: 'accountGone' | 'expired' | null }
+type State = { status: SessionStatus; notice: SignOutNotice }
 
 let state: State = { status: 'loading', notice: null }
-let tokens: TokenResponse | null = null
 const listeners = new Set<() => void>()
 
 function setState(next: State) {
@@ -50,114 +49,72 @@ export function useSession(): State {
   )
 }
 
-// --- the refresh token in SecureStore, in chunks ---
+// --- storage ---
 
-/**
- * Each save writes the chunks under a new generation (`.g<n>.<i>`) and only then points `.current`
- * (`"<n>:<parts>"`) at it, so a crash or a failed write half-way keeps the previous token: Microsoft
- * has already rotated it, and losing both would sign the student out. Old chunks are deleted last.
- * Tokens saved before generations (`.count` + `.<i>`) are still read once, then removed.
- */
-const KEY = 'auth.refreshToken'
-const CHUNK = 1800
-
-async function readPointer(): Promise<{ gen: number; parts: number } | null> {
-  const [gen, parts] = ((await SecureStore.getItemAsync(`${KEY}.current`)) ?? '')
-    .split(':')
-    .map(Number)
-  return gen > 0 && parts > 0 ? { gen, parts } : null
+const KEY = 'auth.session.refreshToken'
+const STORE_OPTIONS: SecureStore.SecureStoreOptions = {
+  keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
 }
 
-async function readChunks(prefix: string, parts: number): Promise<string | null> {
-  let value = ''
-  for (let i = 0; i < parts; i++) {
-    const part = await SecureStore.getItemAsync(`${prefix}.${i}`)
-    if (part === null) return null
-    value += part
-  }
-  return value
+const store = {
+  read: () => SecureStore.getItemAsync(KEY, STORE_OPTIONS),
+  write: (refreshToken: string) => SecureStore.setItemAsync(KEY, refreshToken, STORE_OPTIONS),
+  clear: () => SecureStore.deleteItemAsync(KEY, STORE_OPTIONS),
 }
 
-async function deleteChunks(prefix: string, parts: number) {
-  for (let i = 0; i < parts; i++) await SecureStore.deleteItemAsync(`${prefix}.${i}`)
+// --- the API calls the session makes itself ---
+
+async function refreshSession(refreshToken: string): Promise<TokenResponse | 'ended'> {
+  const result = await plainApi.POST('/auth/refresh', { body: { refreshToken } })
+  return result.response.status === 401 ? 'ended' : unwrap(result)
 }
 
-async function clearLegacy() {
-  const count = Number(await SecureStore.getItemAsync(`${KEY}.count`)) || 0
-  await SecureStore.deleteItemAsync(`${KEY}.count`)
-  await deleteChunks(KEY, Math.max(count, 8))
-}
-
-async function saveRefreshToken(value: string | undefined) {
-  if (!value) return clearRefreshToken()
-  const old = await readPointer()
-  const gen = (old?.gen ?? 0) + 1
-  const parts = Math.ceil(value.length / CHUNK)
-  for (let i = 0; i < parts; i++) {
-    await SecureStore.setItemAsync(`${KEY}.g${gen}.${i}`, value.slice(i * CHUNK, (i + 1) * CHUNK))
-  }
-  await SecureStore.setItemAsync(`${KEY}.current`, `${gen}:${parts}`)
-  // The new token is safe now; leftovers of the old one only cost space.
+/** The one-time exchange of an app 0.1.3 Microsoft session (see the top of this file). */
+async function exchangeMicrosoftSession(): Promise<Recovered | 'ended' | null> {
+  const stored = await readMicrosoftRefreshToken()
+  if (!stored) return null
+  let microsoft: Awaited<ReturnType<typeof refreshMicrosoft>>
   try {
-    if (old) await deleteChunks(`${KEY}.g${old.gen}`, old.parts)
-    await clearLegacy()
-  } catch {
-    // Removed on the next save or sign-out.
-  }
-}
-
-async function readRefreshToken(): Promise<string | null> {
-  const pointer = await readPointer()
-  if (pointer) return readChunks(`${KEY}.g${pointer.gen}`, pointer.parts)
-  const legacy = Number(await SecureStore.getItemAsync(`${KEY}.count`))
-  return legacy ? readChunks(KEY, legacy) : null
-}
-
-async function clearRefreshToken() {
-  const pointer = await readPointer()
-  await SecureStore.deleteItemAsync(`${KEY}.current`)
-  if (pointer) await deleteChunks(`${KEY}.g${pointer.gen}`, pointer.parts)
-  await clearLegacy()
-}
-
-// --- refreshing ---
-
-/** A refresh the token endpoint refused (revoked, expired): the student has to sign in again. */
-function isRefused(error: unknown): boolean {
-  const code = (error as { code?: string } | null)?.code
-  return code === 'invalid_grant' || code === 'interaction_required' || code === 'invalid_client'
-}
-
-let refreshing: Promise<TokenResponse | null> | null = null
-
-/**
- * Bumped by every sign-in and sign-out. A refresh that finishes after one of them belongs to a
- * session that is over: its tokens are dropped, never saved (they'd sign the old student back in).
- */
-let epoch = 0
-
-async function refresh(refreshToken: string): Promise<TokenResponse | null> {
-  const started = epoch
-  try {
-    const next = await refreshAsync(
-      { clientId: CLIENT_ID, refreshToken, scopes: SCOPES },
-      discovery,
-    )
-    if (started !== epoch || state.status !== 'signedIn') return null
-    // Microsoft rotates refresh tokens; keep the old one only if it sent none.
-    if (!next.refreshToken) next.refreshToken = refreshToken
-    tokens = next
-    await saveRefreshToken(next.refreshToken)
-    return next
+    microsoft = await refreshMicrosoft(stored)
   } catch (error) {
-    if (started !== epoch) return null
-    if (isRefused(error)) {
-      await signOut('expired')
-      return null
-    }
-    throw error
+    if (!isRefusedByMicrosoft(error)) throw error
+    await clearMicrosoftRefreshToken().catch(() => undefined)
+    return 'ended'
   }
+  // Microsoft rotates its refresh tokens: keep the new one until the exchange has worked.
+  if (microsoft.refreshToken !== stored) {
+    await saveMicrosoftRefreshToken(microsoft.refreshToken).catch(() => undefined)
+  }
+
+  const result = await plainApi.POST('/auth/microsoft', {
+    body: { accessToken: microsoft.accessToken },
+  })
+  if (result.response.status === 401) {
+    await clearMicrosoftRefreshToken().catch(() => undefined)
+    return 'ended'
+  }
+  const tokens = unwrap(result)
+  if (tokens.isNew) {
+    // There was no account any more: the student deleted it (maybe on another device). Undo the
+    // one this call just made, so a phone that still held tokens can't bring it back.
+    await plainApi
+      .DELETE('/me', { headers: { Authorization: `Bearer ${tokens.accessToken}` } })
+      .catch(() => undefined)
+    await signOut('accountGone')
+    return null
+  }
+  console.warn('[auth] the Microsoft session was exchanged for a CampusPulse one')
+  return { tokens, onStored: () => clearMicrosoftRefreshToken().catch(() => undefined) }
 }
+
+const keeper = createTokenKeeper({
+  store,
+  refresh: refreshSession,
+  recover: exchangeMicrosoftSession,
+  onEnded: (reason) => signOut(reason === 'expired' ? 'expired' : null),
+})
+
+// --- what the rest of the app uses ---
 
 /** Reads the stored session once, at app start. Offline still counts as signed in. */
 const LOAD_TIMEOUT_MS = 4000
@@ -166,11 +123,11 @@ export async function loadSession(): Promise<void> {
   try {
     // A Keystore read that never answers (seen on some Android devices) must not keep the splash
     // up forever: after the timeout the student signs in again.
-    const refreshToken = await Promise.race([
-      readRefreshToken(),
+    const found = await Promise.race([
+      (async () => (await store.read()) ?? (await readMicrosoftRefreshToken()))(),
       new Promise<null>((resolve) => setTimeout(() => resolve(null), LOAD_TIMEOUT_MS)),
     ])
-    if (!refreshToken) return setState({ status: 'signedOut', notice: null })
+    if (!found) return setState({ status: 'signedOut', notice: null })
     setState({ status: 'signedIn', notice: null })
     // Get an access token now, so the first screen's requests don't each wait for one.
     void getAccessToken().catch(() => undefined)
@@ -179,91 +136,43 @@ export async function loadSession(): Promise<void> {
   }
 }
 
-/** A valid access token for our API, refreshed when it expires within 5 minutes; null if signed out. */
+/** A valid access token for our API (refreshed when needed), or null when signed out. */
 export async function getAccessToken(): Promise<string | null> {
-  if (state.status !== 'signedIn') return null
-  // shouldRefresh(): expired, or expiring within 10 minutes.
-  if (tokens && !tokens.shouldRefresh()) return tokens.accessToken
-  if (!refreshing) {
-    refreshing = (async () => {
-      const refreshToken = tokens?.refreshToken ?? (await readRefreshToken())
-      if (!refreshToken) {
-        await signOut(null)
-        return null
-      }
-      return refresh(refreshToken)
-    })().finally(() => {
-      refreshing = null
-    })
-  }
-  return (await refreshing)?.accessToken ?? null
+  return state.status === 'signedIn' ? keeper.accessToken() : null
 }
 
-// --- signing in and out ---
+/** After our API answered 401 to a request sent with `sent`: the token to retry it with, once. */
+export async function accessTokenAfterUnauthorized(sent: string): Promise<string | null> {
+  return state.status === 'signedIn' ? keeper.afterUnauthorized(sent) : null
+}
 
-export type SignInResult = 'signedIn' | 'cancelled'
+/** The API refused a token it was just given: this session doesn't work, sign out. */
+export async function sessionRefused(token: string): Promise<void> {
+  if (state.status === 'signedIn' && keeper.isCurrent(token)) await signOut('expired')
+}
 
-/**
- * The interactive sign-in: Microsoft's page in an in-app browser tab, the code exchanged with PKCE,
- * then `POST /me` (passed in, so this module doesn't import the API client that imports it).
- */
-export async function signIn(
-  createAccount: (accessToken: string) => Promise<void>,
-): Promise<SignInResult> {
-  const request = new AuthRequest({
-    clientId: CLIENT_ID,
-    scopes: SCOPES,
-    redirectUri: REDIRECT_URI,
-    usePKCE: true,
-    prompt: Prompt.SelectAccount,
-  })
-  const result = await request.promptAsync(discovery)
-  // Never the code or a token: only how the attempt ended, and Microsoft's error if any.
-  console.warn(
-    '[auth] sign-in page ended:',
-    result.type,
-    result.type === 'error'
-      ? `${result.params.error ?? ''} ${(result.params.error_description ?? '').slice(0, 160)}`
-      : '',
-  )
-  if (result.type === 'cancel' || result.type === 'dismiss') return 'cancelled'
-  if (result.type !== 'success') {
-    throw new Error(result.type === 'error' ? (result.params.error ?? 'error') : result.type)
-  }
-
-  const next = await exchangeCodeAsync(
-    {
-      clientId: CLIENT_ID,
-      code: result.params.code,
-      redirectUri: REDIRECT_URI,
-      extraParams: { code_verifier: request.codeVerifier ?? '' },
-    },
-    discovery,
-  )
-  await createAccount(next.accessToken)
-  epoch++
-  tokens = next
-  await saveRefreshToken(next.refreshToken)
+/** Starts the session a sign-in returned (`signIn.ts`). */
+export async function beginSession(tokens: TokenResponse): Promise<void> {
+  await keeper.begin(tokens)
+  // A phone that signs in fresh has no use for an old Microsoft session any more.
+  await clearMicrosoftRefreshToken().catch(() => undefined)
   setState({ status: 'signedIn', notice: null })
-  return 'signedIn'
 }
 
 /**
  * Drops the tokens, and the Campus Virtual connection with them: its token is full access to the
  * student's Moodle account and must not stay for whoever signs in next. `notice` says why on the
- * sign-in screen (deleted elsewhere, expired).
+ * sign-in screen (deleted elsewhere, expired); without one it's the student's own sign-out, and the
+ * session is also ended on the server (without waiting: offline, it ends on this phone anyway).
  */
-export async function signOut(notice: State['notice'] = null): Promise<void> {
-  epoch++
-  tokens = null
+export async function signOut(notice: SignOutNotice = null): Promise<void> {
   try {
-    await Promise.allSettled([clearRefreshToken(), disconnectCampusVirtual()])
+    const refreshToken = await keeper.forget()
+    if (refreshToken && notice === null) {
+      void plainApi.POST('/auth/sign-out', { body: { refreshToken } }).catch(() => undefined)
+    }
+    await Promise.allSettled([clearMicrosoftRefreshToken(), disconnectCampusVirtual()])
   } finally {
     setState({ status: 'signedOut', notice })
   }
-}
-
-/** Whether a student is signed in right now (the API client's 401 handling asks). */
-export function isSignedIn(): boolean {
-  return state.status === 'signedIn'
 }

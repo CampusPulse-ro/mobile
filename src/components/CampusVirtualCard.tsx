@@ -2,18 +2,23 @@ import { useRouter } from 'expo-router'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
 
-import { useCampusVirtual } from '@/campusVirtual/useCampusVirtual'
+import type { useCampusVirtual } from '@/campusVirtual/useCampusVirtual'
 import { Button, Heading, Muted } from '@/components/ui'
 import { color, radius, space } from '@/theme'
 
 /**
  * Profile's Campus Virtual section: connect, see who is connected, open the assignments,
- * reconnect, disconnect.
+ * reconnect, disconnect. The connection (`useCampusVirtual()`) comes from the screen, which shares
+ * it with the Account section.
  */
-export function CampusVirtualCard() {
+export function CampusVirtualCard({
+  campusVirtual,
+}: {
+  campusVirtual: ReturnType<typeof useCampusVirtual>
+}) {
   const { t } = useTranslation()
   const router = useRouter()
-  const { state, connect, disconnect, retry } = useCampusVirtual()
+  const { state, connect, disconnect, retry } = campusVirtual
 
   return (
     <View style={styles.card}>

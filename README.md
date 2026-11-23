@@ -96,6 +96,24 @@ bun run api:types    # regenerate src/api/schema.d.ts from the api repo's main, 
 Which API a build uses: `src/config.ts` (stage for development and preview, prod for production).
 How screens call it: CONTRIBUTING, "Calling the API".
 
+## Signing in
+
+CampusPulse has its own accounts (the API's README, "Sign-in"). Code: `src/auth/`.
+
+- **Two ways in:** "Continue with UPT" (UPT's Microsoft sign-in in an in-app browser tab, PKCE; its
+  Entra access token goes to `POST /auth/microsoft` once) and an email with a 6-digit code
+  (`/auth/email/start`, `/auth/email/verify`). Signing in creates the account; the app never calls
+  `POST /me`. UPT can also be linked and unlinked later, on Profile.
+- **Our tokens:** the refresh token in SecureStore (`auth.session.refreshToken`, this device only),
+  the 15-minute access token in memory. It is refreshed shortly before it expires, and once after a
+  401 (the request is retried once). Only one refresh runs at a time: the API rotates refresh tokens
+  and treats one shown twice as stolen. A refresh the API refuses signs out. `src/auth/tokens.ts`
+  holds that logic without React Native imports, so it can run against the stage API on its own.
+- **Phones signed in by 0.1.3** hold a Microsoft refresh token instead. The first time the app needs
+  a token, it exchanges that session once for ours and deletes it (`src/auth/legacy.ts`). If that
+  exchange creates an account (`isNew`), the student had deleted theirs: the new one is deleted again
+  and the phone signs out.
+
 ## Releasing
 
 - Tags are `vX.Y.Z` (semver). Only admins can create `v*` tags (a tag ruleset).

@@ -3,8 +3,10 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 
-import { api, ApiError, unwrap } from '@/api/client'
+import { api, ApiError } from '@/api/client'
 import { signOut } from '@/auth'
+import { AccountCard } from '@/auth/AccountCard'
+import { useCampusVirtual } from '@/campusVirtual/useCampusVirtual'
 import { CampusVirtualCard } from '@/components/CampusVirtualCard'
 import { LanguageSwitch } from '@/components/LanguageSwitch'
 import { Button, Heading, Muted, Screen, Title } from '@/components/ui'
@@ -23,13 +25,16 @@ import { color, radius, space } from '@/theme'
 
 export default function ProfileScreen() {
   const { t } = useTranslation()
+  // One Campus Virtual connection for both cards: Account offers to connect it right after UPT
+  // is linked, and its own card below shows the result.
+  const campusVirtual = useCampusVirtual()
   return (
     <Screen>
       <ScrollView contentContainerStyle={styles.content}>
         <Title>{t('profile.title')}</Title>
-        <AccountCard />
+        <AccountCard campusVirtual={campusVirtual} onSignOut={() => void signOutHere()} />
         <RemindersCard />
-        <CampusVirtualCard />
+        <CampusVirtualCard campusVirtual={campusVirtual} />
         <Muted>{t('profile.language')}</Muted>
         <LanguageSwitch />
         <DeleteAccount />
@@ -38,31 +43,10 @@ export default function ProfileScreen() {
   )
 }
 
-/** Signing out forgets this phone for push first, while the token still works. */
+/** Signing out forgets this phone for push first, while the token still works; then the session. */
 async function signOutHere() {
   await unregisterPush()
   await signOut()
-}
-
-/** Who is signed in (`GET /me`), and Sign out. */
-function AccountCard() {
-  const { t } = useTranslation()
-  const me = useQuery({
-    queryKey: ['me', 'account'],
-    queryFn: async () => unwrap(await api.GET('/me')),
-  })
-  return (
-    <View style={styles.card}>
-      <Heading>{t('auth.account')}</Heading>
-      {me.data ? (
-        <View>
-          <Text style={styles.name}>{me.data.displayName}</Text>
-          <Muted>{me.data.email}</Muted>
-        </View>
-      ) : null}
-      <Button label={t('auth.signOut')} variant="secondary" onPress={() => void signOutHere()} />
-    </View>
-  )
 }
 
 /** Class reminders: allow notifications for this phone, and a test send through our server. */
@@ -239,7 +223,6 @@ const styles = StyleSheet.create({
     padding: space.lg,
     gap: space.md,
   },
-  name: { color: color.ink, fontSize: 16, fontWeight: '600' },
   message: { color: color.ink, fontSize: 15 },
   leadBlock: { gap: space.sm },
   leadLabel: { color: color.ink, fontSize: 15, fontWeight: '600' },

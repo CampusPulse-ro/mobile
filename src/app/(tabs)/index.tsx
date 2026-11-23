@@ -3,10 +3,19 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native'
 
+import { useMe } from '@/auth'
+import { UptNudge } from '@/auth/UptNudge'
 import type { Deadline } from '@/campusVirtual'
 import { EmptyState, ErrorState, LoadingState, Pill } from '@/components/States'
 import { Button, Screen, Title } from '@/components/ui'
-import { DeadlineSheet, DueSoon, useDeadlines } from '@/deadlines'
+import {
+  DeadlineSheet,
+  DueSoon,
+  ManualDeadlineSheet,
+  useDeadlines,
+  useManualDeadlines,
+  type DueItem,
+} from '@/deadlines'
 import { useDateTimeFormat } from '@/i18n/format'
 import { color, radius, space, type } from '@/theme'
 import {
@@ -31,7 +40,8 @@ import {
 
 /**
  * Today's classes in time order, the one going on now highlighted, or why there are none; below
- * them the Campus Virtual deadlines due soon.
+ * them the deadlines due soon (Campus Virtual's and the student's own), and while UPT isn't linked,
+ * a banner suggesting it.
  */
 export default function TodayScreen() {
   const { t } = useTranslation()
@@ -50,10 +60,20 @@ export default function TodayScreen() {
   const upcoming = useMyTimetable(addDays(today, 1), addDays(today, 14), {
     enabled: hasGroup && noClasses,
   })
-  // Campus Virtual, straight from Moodle: its own states, never in the way of the classes.
+  // Deadlines (Campus Virtual's straight from Moodle, and the student's own): their own states,
+  // never in the way of the classes.
   const deadlines = useDeadlines()
+  const manualDeadlines = useManualDeadlines()
+  const me = useMe()
   const [selected, setSelected] = useState<Occurrence | null>(null)
   const [selectedDeadline, setSelectedDeadline] = useState<Deadline | null>(null)
+  const [selectedManualId, setSelectedManualId] = useState<string | null>(null)
+  const selectedManual =
+    manualDeadlines.data?.find((deadline) => deadline.id === selectedManualId) ?? null
+  const openDeadline = (item: DueItem) => {
+    if (item.kind === 'manual') setSelectedManualId(item.deadline.id)
+    else setSelectedDeadline(item.deadline)
+  }
   const [refreshing, setRefreshing] = useState(false)
 
   const day = campusNoon(today)
@@ -91,6 +111,8 @@ export default function TodayScreen() {
       semester.refetch(),
       hasGroup && timetable.refetch(),
       deadlines.refetch(),
+      manualDeadlines.refetch(),
+      me.refetch(),
     ])
     setRefreshing(false)
   }
@@ -187,7 +209,15 @@ export default function TodayScreen() {
 
         {body}
 
-        <DueSoon deadlines={deadlines} today={today} onOpen={setSelectedDeadline} />
+        <UptNudge />
+        <DueSoon
+          campusVirtual={deadlines}
+          manual={manualDeadlines}
+          uptLinked={me.data?.uptLinked}
+          today={today}
+          now={now.getTime()}
+          onOpen={openDeadline}
+        />
 
         {notes.length > 0 ? (
           <View style={styles.notes}>
@@ -202,6 +232,7 @@ export default function TodayScreen() {
       </ScrollView>
       <ClassSheet occurrence={selected} onClose={() => setSelected(null)} />
       <DeadlineSheet deadline={selectedDeadline} onClose={() => setSelectedDeadline(null)} />
+      <ManualDeadlineSheet deadline={selectedManual} onClose={() => setSelectedManualId(null)} />
     </Screen>
   )
 }
