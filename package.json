@@ -64,5 +64,21 @@
     "api:types": "openapi-typescript https://raw.githubusercontent.com/CampusPulse-ro/api/main/openapi/v1.json -o src/api/schema.d.ts",
     "api:check:prod": "openapi-typescript https://campuspulse-api.thorsp.net/openapi/v1.json -o src/api/schema.d.ts --check"
   },
+  "expo": {
+    "install": {
+      "exclude": [
+        "expo",
+        "expo-auth-session",
+        "expo-constants",
+        "expo-dev-client",
+        "expo-glass-effect",
+        "expo-linking",
+        "expo-notifications",
+        "expo-router",
+        "expo-splash-screen",
+        "expo-updates"
+      ]
+    }
+  },
   "private": true
 }
