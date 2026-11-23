@@ -23,14 +23,6 @@ export default function TabsLayout() {
         <NativeTabs.Trigger.Icon sf="calendar" md="calendar_month" />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="map">
-        <NativeTabs.Trigger.Label>{t('tabs.map')}</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon
-          sf={{ default: 'door.left.hand.open', selected: 'door.left.hand.open' }}
-          md="meeting_room"
-        />
-      </NativeTabs.Trigger>
-
       <NativeTabs.Trigger name="profile">
         <NativeTabs.Trigger.Label>{t('tabs.profile')}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon

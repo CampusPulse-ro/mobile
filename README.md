@@ -13,7 +13,7 @@ Bun · oxlint.
 
 | Path                    | What                                                                                                                                                                    |
 | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/app/`              | Routes. `_layout` sets the navigation theme; `(tabs)/` = Today, Timetable, Map, Profile (placeholders)                                                                  |
+| `src/app/`              | Routes. `_layout` sets the navigation theme; `(tabs)/` = Today, Timetable, Profile                                                                                      |
 | `src/components/ui.tsx` | Shared building blocks (`Screen`, `Title`, `Muted`, `Placeholder`)                                                                                                      |
 | `src/theme.ts`          | Design tokens (colors, spacing, radius), generated from the web repo's `design/tokens.json` by `bun run design:tokens` ([docs/design-system.md](docs/design-system.md)) |
 | `src/i18n/`             | Translations: English (default) and Romanian in `en.json` / `ro.json`, setup in `index.ts`, dates via `useDateTimeFormat()` in `format.ts`                              |

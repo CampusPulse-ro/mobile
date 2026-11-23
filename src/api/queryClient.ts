@@ -28,13 +28,13 @@ if (Platform.OS !== 'web') {
 }
 
 /**
- * The cache is also stored on the phone (AsyncStorage), so the last loaded timetable, rooms and
- * deadlines show with no connection, or on UPT Wi-Fi, whose firewall blocks our API. Only answers
- * the student could see anyway are stored, never a token. The stored copy expires after a week and
- * is dropped when the app version changes; signing out removes it (`forgetStoredCache`).
+ * The cache is also stored on the phone (AsyncStorage), so the last loaded timetable and deadlines
+ * show with no connection, or on UPT Wi-Fi, whose firewall blocks our API. Only answers the student
+ * could see anyway are stored, never a token. The stored copy expires after a week and is dropped
+ * when the app version changes; signing out removes it (`forgetStoredCache`).
  */
 const CACHE_SHAPE = 2
-const STORED_ROOTS = new Set(['me', 'semester', 'timetable', 'rooms', 'campusVirtual'])
+const STORED_ROOTS = new Set(['me', 'semester', 'timetable', 'campusVirtual'])
 
 const persister = createAsyncStoragePersister({
   storage: AsyncStorage,

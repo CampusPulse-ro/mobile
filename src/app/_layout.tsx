@@ -134,7 +134,6 @@ function Routes() {
       </Stack.Protected>
       <Stack.Protected guard={signedIn && !needsSetup}>
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="room/[code]" />
         <Stack.Screen name="assignments" />
         <Stack.Screen name="assignment/[id]" />
         <Stack.Screen name="deadlines" />

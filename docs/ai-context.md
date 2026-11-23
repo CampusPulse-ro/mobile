@@ -22,7 +22,7 @@ plain words. Keep each change small enough to read and test in a few minutes.
 
 | Path                    | What                                                                                                                                                              |
 | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/app/`              | Screens. Each file is a route (expo-router). `(tabs)/` = Today, Timetable, Map, Profile                                                                           |
+| `src/app/`              | Screens. Each file is a route (expo-router). `(tabs)/` = Today, Timetable, Profile                                                                                |
 | `src/app/_layout.tsx`   | Root layout: navigation theme and stack                                                                                                                           |
 | `src/components/ui.tsx` | Shared building blocks: `Screen`, `Title`, `Muted`, `Placeholder`                                                                                                 |
 | `src/theme.ts`          | Design tokens: `color`, `space`, `radius`, generated from the web repo's `design/tokens.json` (`bun run design:tokens`; never edit)                               |
