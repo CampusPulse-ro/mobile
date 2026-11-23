@@ -467,6 +467,7 @@
     "lastMethod": "UPT is the only way into this account, so it can't be unlinked.",
     "uptRefused": "UPT's sign-in couldn't be verified, so nothing was linked. Try again.",
     "uptUnavailable": "Linking UPT doesn't work right now. Try again later.",
+    "linkFailed": "Linking didn't finish. Try again.",
     "wait": "Too many tries. Wait a minute, then try again.",
     "offerCampusVirtual": "Connect Campus Virtual now to see your courses' deadlines here."
   },

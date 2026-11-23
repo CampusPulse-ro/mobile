@@ -11,7 +11,7 @@ import { apiBase } from '@/config'
 import { fetchWithSession } from './http'
 import type { paths } from './schema'
 
-export { ApiError, problemType, TimeoutError, unwrap } from './http'
+export { ApiError, isUnreachable, problemType, TimeoutError, unwrap } from './http'
 
 export const api = createClient<paths>({
   baseUrl: apiBase,

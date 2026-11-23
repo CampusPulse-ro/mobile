@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 
-import { ApiError, problemType } from '@/api/client'
+import { ApiError, isUnreachable, problemType } from '@/api/client'
 import { signInWithUpt, useSession } from '@/auth'
 import { EmailSignIn } from '@/auth/EmailSignIn'
 import { Button, Muted, Screen } from '@/components/ui'
@@ -33,9 +33,12 @@ export default function SignInScreen() {
           ? t('auth.uptRefused')
           : error instanceof ApiError && error.status === 503
             ? t('auth.uptUnavailable')
-            : error instanceof ApiError
-              ? t('auth.failed')
-              : t('auth.unreachable'),
+            : isUnreachable(error)
+              ? t('auth.unreachable')
+              : error instanceof ApiError
+                ? t('auth.failed')
+                : // Microsoft's page or its token exchange: its own reason helps.
+                  `${t('auth.failed')} (${error instanceof Error ? error.message.slice(0, 80) : ''})`,
       )
     } finally {
       setBusy(false)

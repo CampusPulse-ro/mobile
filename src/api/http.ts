@@ -135,6 +135,14 @@ export function unwrap<T>(result: { data?: T; error?: unknown; response: Respons
   return result.data as T
 }
 
+/**
+ * A request that never got an answer: no connection, or the timeout. React Native's fetch rejects
+ * with a `TypeError` ("Network request failed") when it can't connect.
+ */
+export function isUnreachable(error: unknown): boolean {
+  return error instanceof TimeoutError || error instanceof TypeError
+}
+
 /** The ProblemDetails `type` of an error, when the API answered with one. */
 export function problemType(error: unknown): string | null {
   return error instanceof ApiError ? error.type : null

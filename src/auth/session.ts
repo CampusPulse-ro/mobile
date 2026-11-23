@@ -14,7 +14,7 @@
 import * as SecureStore from 'expo-secure-store'
 import { useSyncExternalStore } from 'react'
 
-import { plainApi, unwrap } from '@/api/http'
+import { ApiError, plainApi, unwrap } from '@/api/http'
 import { disconnect as disconnectCampusVirtual } from '@/campusVirtual'
 
 import {
@@ -64,9 +64,43 @@ const store = {
 
 // --- the API calls the session makes itself ---
 
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+/**
+ * `POST /auth/refresh`. The API rotates the token as it answers; when that answer is lost (a
+ * timeout, a dropped connection), the old token still works for a minute while the new one is
+ * unused, and after that it counts as stolen and ends the session. So a refresh that never got an
+ * answer is tried again within that minute (three tries take at most ~52 s).
+ */
 async function refreshSession(refreshToken: string): Promise<TokenResponse | 'ended'> {
-  const result = await plainApi.POST('/auth/refresh', { body: { refreshToken } })
-  return result.response.status === 401 ? 'ended' : unwrap(result)
+  for (let attempt = 1; ; attempt++) {
+    try {
+      const result = await plainApi.POST('/auth/refresh', { body: { refreshToken } })
+      return result.response.status === 401 ? 'ended' : unwrap(result)
+    } catch (error) {
+      if (error instanceof ApiError || attempt === 3) throw error
+      await wait(attempt === 1 ? 2000 : 5000)
+    }
+  }
+}
+
+/**
+ * Deletes the account a token belongs to, retried a few times: it runs right after a call on the
+ * same network worked, so a failure is most likely a moment's dropout. Resolves whether it worked.
+ */
+async function deleteAccount(accessToken: string): Promise<boolean> {
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const result = await plainApi.DELETE('/me', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+      if (result.response.ok || result.response.status === 404) return true
+    } catch {
+      // Tried again below.
+    }
+    if (attempt < 3) await wait(attempt * 2000)
+  }
+  return false
 }
 
 /** The one-time exchange of an app 0.1.3 Microsoft session (see the top of this file). */
@@ -96,10 +130,14 @@ async function exchangeMicrosoftSession(): Promise<Recovered | 'ended' | null> {
   const tokens = unwrap(result)
   if (tokens.isNew) {
     // There was no account any more: the student deleted it (maybe on another device). Undo the
-    // one this call just made, so a phone that still held tokens can't bring it back.
-    await plainApi
-      .DELETE('/me', { headers: { Authorization: `Bearer ${tokens.accessToken}` } })
-      .catch(() => undefined)
+    // one this call just made, so a phone that still held tokens can't bring it back. If even the
+    // retries fail, its session is ended at least, and the empty account stays.
+    if (!(await deleteAccount(tokens.accessToken))) {
+      console.warn('[auth] the re-created account could not be deleted')
+      await plainApi
+        .POST('/auth/sign-out', { body: { refreshToken: tokens.refreshToken } })
+        .catch(() => undefined)
+    }
     await signOut('accountGone')
     return null
   }

@@ -208,6 +208,8 @@ function CodeStep({
     setBurned(false)
     setCode('')
     setNote(t('auth.code.resent'))
+    // The countdown's clock stopped at 0: restart it from now for the new wait.
+    setNow(Date.now())
     onResent(result)
     input.current?.focus()
   }

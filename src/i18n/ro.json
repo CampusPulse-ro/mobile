@@ -467,6 +467,7 @@
     "lastMethod": "Contul UPT e singura cale de intrare în acest cont, așa că nu poate fi dezasociat.",
     "uptRefused": "Autentificarea UPT nu a putut fi verificată, așa că nu s-a asociat nimic. Încearcă din nou.",
     "uptUnavailable": "Asocierea cu UPT nu funcționează acum. Încearcă mai târziu.",
+    "linkFailed": "Asocierea nu s-a încheiat. Încearcă din nou.",
     "wait": "Prea multe încercări. Așteaptă un minut, apoi încearcă din nou.",
     "offerCampusVirtual": "Conectează acum Campus Virtual ca să vezi aici termenele de la cursuri."
   },

@@ -69,17 +69,20 @@ export default function DeadlinesScreen() {
     />
   )
 
+  // Own deadlines that failed with nothing else to show take the whole screen; otherwise their
+  // failure is one line above the list.
+  const manualFailed = manual.isError && !manual.data && upcoming.length === 0
   let body
-  if (manual.isPending && campusVirtual.isPending) {
-    body = <LoadingState />
-  } else if (manual.isError && !manual.data && upcoming.length === 0) {
+  if (manualFailed) {
     body = <ErrorState error={manual.error} onRetry={() => void manual.refetch()} />
   } else if (upcoming.length === 0 && done.length === 0) {
-    body = manual.isPending ? (
-      <LoadingState />
-    ) : (
-      <EmptyState title={t('deadlines.screen.empty')} about={t('deadlines.screen.emptyAbout')} />
-    )
+    // "No deadlines" only once both sources have answered, or a late one could contradict it.
+    body =
+      manual.isPending || campusVirtual.isPending ? (
+        <LoadingState />
+      ) : (
+        <EmptyState title={t('deadlines.screen.empty')} about={t('deadlines.screen.emptyAbout')} />
+      )
   } else {
     body = (
       <View style={styles.list}>
@@ -128,7 +131,7 @@ export default function DeadlinesScreen() {
         />
         <UptNudge />
         <Button label={t('deadlines.own.add')} onPress={() => router.push('/deadline/new')} />
-        {manual.data ? <ManualProblem manual={manual} /> : null}
+        {manualFailed ? null : <ManualProblem manual={manual} />}
         <CampusVirtualLine campusVirtual={campusVirtual} uptLinked={me.data?.uptLinked} />
         {body}
       </ScrollView>

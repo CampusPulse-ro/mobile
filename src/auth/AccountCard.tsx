@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native'
 
-import { ApiError, problemType } from '@/api/client'
+import { ApiError, isUnreachable, problemType } from '@/api/client'
 import type { useCampusVirtual } from '@/campusVirtual/useCampusVirtual'
 import { Button, Heading, Muted } from '@/components/ui'
 import { color, radius, space, type } from '@/theme'
@@ -39,7 +39,9 @@ export function AccountCard({
     if (kind === 'microsoft-token-invalid') return t('account.uptRefused')
     if (error instanceof ApiError && error.status === 503) return t('account.uptUnavailable')
     if (error instanceof ApiError && error.status === 429) return t('account.wait')
-    return error instanceof ApiError ? t('api.serverError') : t('api.unreachable')
+    if (error instanceof ApiError) return t('api.serverError')
+    // Not an answer from our API: no connection, or Microsoft's page ended in an error.
+    return isUnreachable(error) ? t('api.unreachable') : t('account.linkFailed')
   }
 
   const linkNow = () => {

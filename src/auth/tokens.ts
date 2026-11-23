@@ -24,8 +24,9 @@ export type RefreshTokenStore = {
 
 /**
  * Where a session comes from when this phone holds no refresh token of ours (the old Microsoft
- * session, exchanged once): the tokens and what to do once they're stored, `'ended'` when that
- * session can't be used any more, or null when there's nothing at all.
+ * session, exchanged once): the tokens and what to do once they're safely stored (`onStored` runs
+ * only when the refresh token reached storage), `'ended'` when that session can't be used any more,
+ * or null when there's nothing at all.
  */
 export type Recovered = { tokens: TokenResponse; onStored: () => Promise<void> }
 
@@ -107,23 +108,28 @@ export function createTokenKeeper({
 
   /**
    * Stores the refresh token first (the server has already rotated the old one), then uses the
-   * tokens, unless a sign-in or sign-out happened meanwhile (then false).
+   * tokens. `'stale'` when a sign-in or sign-out happened meanwhile (the tokens are dropped);
+   * `'memory'` when storage refused them: they work for this run only.
    */
-  async function adopt(tokens: TokenResponse, started: number): Promise<boolean> {
+  async function adopt(
+    tokens: TokenResponse,
+    started: number,
+  ): Promise<'stored' | 'memory' | 'stale'> {
     const receivedAt = now()
+    let stored = true
     try {
       await inOrder(() => store.write(tokens.refreshToken))
     } catch {
-      // Kept in memory for this run; the next launch may have to sign in again.
+      stored = false
       console.warn('[auth] the refresh token could not be stored')
     }
-    if (started !== epoch) return false
+    if (started !== epoch) return 'stale'
     current = {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
       expiresAt: receivedAt + accessLifetimeMs(tokens, receivedAt),
     }
-    return true
+    return stored ? 'stored' : 'memory'
   }
 
   async function renew(): Promise<string | null> {
@@ -151,8 +157,10 @@ export function createTokenKeeper({
       tokens = found.tokens
       onStored = found.onStored
     }
-    if (!(await adopt(tokens, started))) return null
-    await onStored?.()
+    const kept = await adopt(tokens, started)
+    if (kept === 'stale') return null
+    // What the session came from goes only once the new one is safely stored.
+    if (kept === 'stored') await onStored?.()
     return tokens.accessToken
   }
 
