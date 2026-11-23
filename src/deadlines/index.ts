@@ -1,4 +1,7 @@
 export * from './api'
 export { DeadlineSheet } from './DeadlineSheet'
-export { DueSoon } from './DueSoon'
+export { DueRow } from './DueRow'
+export { CampusVirtualLine, DueSoon, ManualProblem } from './DueSoon'
+export * from './manual'
+export { ManualDeadlineSheet } from './ManualDeadlineSheet'
 export { useDeadlineText } from './text'

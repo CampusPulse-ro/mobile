@@ -93,6 +93,11 @@ with the Expo SDK (`bunx expo install --fix`). A Dependabot **security** PR on a
 package is the exception it can't skip: close it, and fix it instead by bumping `expo` to the SDK
 patch release that contains the fix, then running `bunx expo install --fix`.
 
+`expo.install.exclude` in `package.json` holds back the Expo packages whose newer SDK 57 patches
+aren't in the installed native build (app 0.1.3): an EAS Update has to keep their JS matching that
+build, so Expo Doctor is told to skip them. Empty the list and run `bunx expo install --fix` in the
+PR that makes the next native build (a new app version).
+
 ## Calling the API
 
 The API's contract (`openapi/v1.json` in the `api` repo) is turned into TypeScript types, so a typo

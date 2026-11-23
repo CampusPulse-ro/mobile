@@ -42,6 +42,12 @@ export function campusToday(now: Date = new Date()): string {
   return toDate(utcMs + campusOffsetMinutes(utcMs) * MINUTE)
 }
 
+/** The campus wall-clock time of an instant, as `HH:mm` (whatever zone the phone is set to). */
+export function campusClock(instant: Date): string {
+  const utcMs = instant.getTime()
+  return new Date(utcMs + campusOffsetMinutes(utcMs) * MINUTE).toISOString().slice(11, 16)
+}
+
 /** The instant a campus wall-clock time happens: `('2026-10-20', '14:00:00')`. */
 export function campusInstant(date: string, time: string): Date {
   const [hours = 0, minutes = 0] = time.split(':').map(Number)
